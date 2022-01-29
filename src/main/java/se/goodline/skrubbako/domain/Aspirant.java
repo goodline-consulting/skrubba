@@ -1,4 +1,4 @@
-package se.goodline.se.skrubbako.domain;
+package se.goodline.skrubbako.domain;
 
 import java.util.Date;
 

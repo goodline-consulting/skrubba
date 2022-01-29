@@ -1,4 +1,4 @@
-package se.goodline.se.skrubbako;
+package se.goodline.skrubbako;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
