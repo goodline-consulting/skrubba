@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th=http://www.thymeleaf.org>
+<head>
+    <meta charset="UTF-8">
+    <title>Payment List</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">	
+  	 <style>
+        .custom-td {
+            border: none; /* Remove border for the custom td class */
+        }
+
+        .custom-td input {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+    <script th:inline="javascript">
+        function showAddParamForm() {
+        	var form = document.getElementById('addParamForm');
+            if (form.style.display == 'table-row')
+            	form.submit();
+            else
+            {	
+        		var linkElement = document.getElementById('regsave');
+        		linkElement.innerHTML = '<span class="fa fa-floppy-o"></span> Spara parameter';
+       
+            	var row = document.getElementById('addParamRow');
+            	row.style.display = 'table-row';
+            	var form = document.getElementById('addParamForm');
+            	form.style.display = 'table-row';
+            }	
+        }
+       
+        function removeRow(button) {
+            // Get the <tr> element containing the button
+            var row = button.closest('tr');
+			
+            if (row.getAttribute('data-id') == 0)
+            {	
+            	//row.parentNode.removeChild(row);
+            	row.style.display = 'none';
+            	var linkElement = document.getElementById('regsave');
+            	var form = document.getElementById('addParamForm');
+            	form.style.display = 'none';
+        		linkElement.innerHTML = '<span class="fa fa-credit-card"></span> Ny parameter';
+            	return;
+            }
+            document.getElementsByName("tenentID")[0]
+            //var csrfToken = document.getElementById('addPaymentForm').querySelector('input[name="_csrf"]').value;
+            var csrfToken = document.getElementsByName('_csrf')[0].value;
+            // Get the data associated with the row (you may use data attributes or other mechanisms to store data)
+            var rowData = {
+                // Example: Assuming there is a data-id attribute on the row
+                id: row.getAttribute('data-id'),
+            };
+            const formData = new FormData();
+            formData.append('id', row.getAttribute('data-id'));
+            // Make an AJAX call to delete the corresponding database row
+            fetch('/param/delete/' + row.getAttribute('data-id'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // If the deletion was successful, remove the row from the table
+                row.parentNode.removeChild(row);
+            })
+            .catch(error => {
+                console.error('Error during removal:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+<div class="container pt-md-2">
+<img th:src="@{/images/skrubbalogga.jpg}" class="img-rounded" alt="Skrubbas Logga">
+
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+  <ul class="navbar-nav mr-auto">
+  	<li class="nav-item active">
+      	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
+    </li>
+    <li class="nav-item active"><a id="regsave" class="nav-link" href="javascript:showAddParamForm()"><span class="fa fa-credit-card"></span> Ny parameter</a></li>    
+  </ul>  
+  <ul class="nav navbar-nav ">		
+	  <li class="nav-item"><a class="nav-link" th:href="@{/}"><span class="fa fa-sign-in"></span> Tillbaka	</a></li>
+  </ul> 
+   
+</nav>
+</div>
+<br>
+<div class = "container">
+	<div class = "row">
+		<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center card">		
+			<div class = "card-body"> 
+		    <table class="table table-striped table-bordered">
+		        <thead>
+		            <tr>
+		                <th>Parameternamn</th>
+		                <th>Värde</th>		                
+		            </tr>
+		        </thead>
+		        <tbody>
+		            <tr th:data-id="${parameter.paramName}" th:each="parameter : ${params}">
+		                <td th:text="${parameter.paramName}"></td>
+		                <td th:text="${parameter.paramValue}"></td>
+		                <td width="5%"><span class="fa fa-trash-o" aria-hidden="true" onclick="removeRow(this)"></span></td>
+		            </tr>
+		            <tr data-id="0" id="addParamRow" style="display: none;">
+		            <form  id="addParamForm" th:action="@{/param/ny}" th:object="${ny_param}" method="post" style="display: none;">
+        				<td><input type="text" class="form-control" id="paramName" th:field="*{paramName}" required></td>
+        				<td><input type="text" class="form-control" id="paramValue" th:field="*{paramValue}" required></td>                         
+                        <td width="5%"><span class="fa fa-trash-o" aria-hidden="true" onclick="removeRow(this)"></span></td>        
+    				</form>
+		            </tr>
+		        </tbody>
+		    </table>
+		    <!-- Form for adding a new payment -->
+    
+		    
+ 		</div>
+ 	</div>
+ </div>
+    
+    
+</body>
+</html>

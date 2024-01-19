@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="se" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Skrubba koloniträdgårdsförening</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/dataTables.bootstrap4.min.css">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
+  <script src="https://cdnout.com/bootstrap-table/bootstrap-table-locale-all.js"></script> 
+</head>
+<title>Skrubba administration</title>
+</head>
+<body>
+<div class="container pt-md-2">
+<img th:src="@{/images/skrubbalogga.jpg}" class="img-rounded" alt="Skrubbas Logga">
+
+<form name="uploadform" method="post" th:action="@{/kolonilott/upload/}" enctype="multipart/form-data"> 
+	<nav class="navbar navbar-expand-sm navbar-light bg-light">
+	  <ul class="navbar-nav mr-auto">
+	  	<li class="nav-item active" style="margin-right: 10px;">
+	      	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
+	    </li>
+	    <li>
+		    <div class="input-group" style="width: 600px;">
+	  			
+	  			<div class="custom-file">
+	    			<input type="file" name="skrubbafil" class="custom-file-input" id="inputGroupFile03" aria-describedby="inputGroupFileAddon03" onchange="updateFileNameLabel()">
+	   				<label class="custom-file-label" for="inputGroupFile03"><i>Ladda fil med data från Skrubbas medlemsregister</i></label>
+	  			</div>
+	  			<div class="input-group-prepend">
+	    			<button class="btn btn-outline-secondary" type="submit" id="inputGroupFileAddon03">Uppdatera</button>
+	  			</div>
+			</div>	    
+	    </li>
+	  </ul>
+	  <ul class="nav navbar-nav ">
+	      
+	      <li class="nav-item"><a class="nav-link" href="/"><span class="fa fa-sign-in"></span> Tillbaka</a></li>
+	  </ul> 
+	</nav>
+</form>
+</div>
+
+<div class ="container">	
+		<br>
+		<div> 
+        	<div th:if = "${message != null}" class="alert alert-success alert-dismissible fade show"  role="alert">
+        		[[${message}]]
+        		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    				<span aria-hidden="true">&times;</span>
+  				</button> 
+        	</div>
+        </div>
+		<table class="table table-striped table-bordered" id="sortTable" data-locale="sv-SE">
+			<thead class = "table-light">
+				<tr>					
+					<th> Lott nr</th>
+					<th> Område</th>
+					<th> Adress </th>
+					<th> Ägare </th>
+					<th> Email </th>					
+					<th> Till salu </th>
+					<th>&nbsp;</th>					
+				</tr>
+			</thead>
+			
+			<tbody>
+				<tr th:each = "lott: ${lottLista}">
+					<td th:text = "${lott.lottnr}"></td>	
+					<td th:text = "${lott.omrade}"></td>				
+					<td th:text = "${lott.adress}"></td>
+					<td th:text = "${lott.agare}"></td>
+					<td><a th:href = "'mailto:' + ${lott.email}"> <i th:text = "${lott.email}"></i></a></td>
+					<td th:if="${lott.tillsalu}">Ja</td>
+					<td th:if="${!lott.tillsalu}"></td>
+					<td>
+						<a th:href = "@{/kolonilott/edit/{lottnr}(lottnr=${lott.lottnr})}"
+						 class = "btn btn-primary">Ändra</a>				 
+					</td>
+				</tr>
+			</tbody>
+		
+		</table>		
+</div>
+<script>
+    function updateFileNameLabel() {
+        // Get the selected file name
+        var fileName = $('#inputGroupFile03').val().split('\\').pop();
+        // Update the label with the file name
+        $('.custom-file-label').text(fileName);
+    }
+</script>
+<script>
+
+$('#sortTable').DataTable({
+formatSearch () {
+    return 'Sök'
+ }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="se" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Ekonomi</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"  crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" crossorigin="anonymous"/>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    
+	 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" crossorigin="anonymous"></script>
+  </head>
+  <body style='background-color:white'>
+  
+ <div class="container pt-md-2">
+ 		<img th:src="@{/images/skrubbalogga.jpg}" class="img-rounded" alt="Skrubbas Logga">   
+      
+        <p></p>
+        <nav class="navbar navbar-expand-sm navbar-light bg-light">
+		  <ul class="navbar-nav mr-auto">
+		  	<li class="nav-item active">
+		      	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
+		    </li>
+		    <form class="d-flex" th:action="@{/ekonomi}" name="betreg" method="post" >
+		    	<button id="knapp" class="btn btn-outline-success mr-3" onclick="registerPayment()"> Registrera betalning</button>
+      			<input class="form-control mr-2" type="text" placeholder="Avinummer" id="avinr" name="avinr" aria-label="Search" style="width: 120px;">
+      			<input class="form-control mr-2" type="text" placeholder="Datum" id="datum" name="datum" th:value="${#dates.format(datum, 'yyyy-MM-dd')}" style="width: 120px;">
+    		</form>
+    		<li class="nav-item dropdown">
+         		<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+          		<span class="fa fa-bar-chart"></span>Rapporter</a>
+        		<ul class="dropdown-menu">
+          			<li><a class="dropdown-item" th:href="@{/ekonomi/rapport1}">Ekonomi</a></li>
+          			<li><a class="dropdown-item" href="#">Reserv</a></li>
+          			<li><hr class="dropdown-divider"></li>
+          			<li><a class="dropdown-item" href="#">Reserv</a></li>
+        		</ul>
+      	  	</li>
+      	  	<li class="nav-item"><a class="nav-link" th:href="@{/ekonomi/fakturera}"><span class="fa fa-envelope-o"></span> fakturera</a></li>
+      	  	<li class="nav-item"><a class="nav-link" onclick="toggleInputGroup()"><span class="fa fa-upload"></span> Uppdatera Visma</a></li>
+		  </ul>
+		 
+		  <ul class="nav navbar-nav ">		
+		  	  <li class="nav-item"><a class="nav-link" th:href="@{/}"><span class="fa fa-sign-in"></span> Tillbaka	</a></li>
+		  </ul>
+		</nav>
+		
+
+        <div> 
+        	<br>
+        	<div th:if = "${message != null}" class="alert alert-success alert-dismissible fade show"  role="alert">
+        		[[${message}]]
+        		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    				<span aria-hidden="true">&times;</span>
+  				</button> 
+        	</div>
+        </div>              
+		<div>
+			<form id="myForm" style="display: none;"  th:action="@{/ekonomi/updatevisma/}" method="post" enctype="multipart/form-data">
+     			<div class="input-group mt-3" style="width: 600px;">
+          			<div class="custom-file">
+              			<input type="file" required name="vismafil" class="custom-file-input" id="inputGroupFile03" aria-describedby="inputGroupFileAddon03" onchange="updateFileNameLabel()">
+              			<label class="custom-file-label" for="inputGroupFile03"><i>Ladda fil med exporterade data ifrån Visma</i></label>
+          			</div>
+          			<div class="input-group-prepend">
+   						<button class="btn btn-outline-secondary" type="submit" id="inputGroupFileAddon03">Uppdatera Visma</button>
+ 					</div>
+     			 </div>
+  			</form>		
+  		</div>			         
+		</div>
+	<script>
+		document.getElementById("knapp").addEventListener("click", function(event) {event.preventDefault()});
+		function toggleInputGroup() {
+	        // Toggle the visibility of the form containing the input group
+	        $('#myForm').toggle();
+	    }
+		function updateFileNameLabel() {
+	        // Get the selected file name
+	        var fileName = $('#inputGroupFile03').val().split('\\').pop();
+	        // Update the label with the file name
+	        $('.custom-file-label').text(fileName);
+	    }
+		function registerPayment() {	    	    	
+	        // Get the invoiceId from the input field
+	        var invoiceId = $("#avinr").val();
+	        var datum = $("#datum").val();	        
+	        var csrfToken = document.getElementsByName('_csrf')[0].value;
+	       
+	        // Perform AJAX call
+	        $.ajax({
+	            type: "POST",
+	            url: "/betalning/registrera/" + invoiceId,
+	            headers: {
+                    'Content-Type': 'plain/text',
+                    'X-CSRF-TOKEN': csrfToken,                    
+                },
+                data: datum,
+	            success: function(response) {
+	                // Display a success alert
+	                alert(response);
+	                return false;
+	            },
+	            error: function(xhr) {
+	                // Display an error alert
+	                if (xhr.status === 404) {
+	                    alert(xhr.responseText);
+	                } else {
+	                    alert("Ett fel inträffade när betalningen skulle registreras. Försök igen.");
+	                }
+	                
+	            }
+	        });
+	    }
+	</script>
+</body></html>
+

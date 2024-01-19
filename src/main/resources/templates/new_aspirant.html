@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="se" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>Skrubba stugkö</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<div class="container">
+	<img th:src="@{images/skrubbalogga.jpg}" class="img-rounded" alt="Skrubbas Logga">
+	<nav class="navbar navbar-default">
+	  <div class="container-fluid">
+	    <div class="navbar-header ">
+	      <a class="navbar-brand" href="http://skrubba.se">Skrubba.se</a>
+	    </div>
+	    <ul class="nav navbar-nav">
+	      <li><a href="/"><span class="active glyphicon glyphicon-home"></span>Home</a></li>
+	      <li><a href="/newAspirantForm">Ställ i kö</a></li>
+	      <li><a href="#">Slappa</a></li>
+	    </ul>
+	    <ul class="nav navbar-nav navbar-right">
+	      <li><a href="#"><span class="glyphicon glyphicon-user"></span> Mina uppgifter</a></li>
+	      <li><a href="/logout"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+	    </ul>
+	  </div>
+	</nav>
+	</div>
+	<div class="container">
+		<h1>Ny person</h1>
+		<hr>
+		<h2>Save Employee</h2>
+
+		<form action="#" th:action="@{/aspirant/new}" th:object="${aspirant}"
+			method="POST">
+			<input type="text" th:field="*{fnamn}"
+				placeholder="Förnamn" class="form-control mb-4 col-4">
+				
+				<input type="text" th:field="*{enamn}"
+				placeholder="Efternamn" class="form-control mb-4 col-4">
+				
+				<input type="text" th:field="*{email}"
+				placeholder="Email" class="form-control mb-4 col-4">
+				
+				<button type="submit" class="btn btn-info col-2"> Spara </button>
+		</form>
+		
+		<hr>
+		
+		<a th:href = "@{/}">Tillbaka</a>
+	</div>
+</body>
+</html>

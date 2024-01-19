@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="se" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Mina uppgifter</title>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" crossorigin="anonymous"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body style='background-color:white'>
+  
+    <div class="container">
+ 		<img th:src="@{/images/skrubbalogga.jpg}" class="img-rounded" alt="Skrubbas Logga">   
+      
+        <p></p>
+        <nav class="navbar navbar-expand-sm navbar-light bg-light">
+		  <ul class="navbar-nav mr-auto">
+		  	<li class="nav-item active">
+		      	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
+		    </li>
+		    
+		  </ul>
+		  <ul class="nav navbar-nav ">
+		  	  <li th:if = "${Role != null}" class="nav-item"><a class="nav-link" th:href="@{/aspirant/remove/{id}(id=${aspirant.id})}"><span class="fa fa-trash"></span> Radera</a></li>
+		  	  <li th:if = "${Role == null}" class="nav-item"><a class="nav-link" th:href="@{/aspirant/change_password/{id}(id=${aspirant.id})}"><span class="fa fa-user"></span> Byt lösenord</a></li>
+		      <li th:if = "${Role != null}" class="nav-item"><form id="fake2" th:action="@{/send_reset_link}" method="post"><input type="hidden" name="id" th:value="${aspirant.id}">
+		      		<a class="nav-link" href="#" onclick="document.getElementById('fake2').submit()"><span class="fa fa-user"></span> Skicka lösenord</a></form></li>
+		      
+		      <li th:if = "${Role == null}" class="nav-item"><a class="nav-link" th:href="@{/userpage/{id}(id=${aspirant.id})}"><span class="fa fa-sign-in"></span> Avbryt</a></li>
+		      <li th:if = "${Role != null}" class="nav-item"><a class="nav-link" th:href="@{/aspirantlista}"><span class="fa fa-sign-in"></span> Avbryt</a></li>
+		  </ul>
+		</nav>
+		
+
+        <div> 
+        	<div th:if = "${message != null}" class="alert alert-success alert-dismissible fade show"  role="alert">
+        		[[${message}]]
+        		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    				<span aria-hidden="true">&times;</span>
+  				</button> 
+        	</div>
+        </div>
+    </div>	        
+        <br>		
+		<div class = "container">
+			<div class = "row">
+			<!-- col-lg-6 col-md-6 col-sm-6 justify-content-center card -->
+				<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center card">
+					
+					<div class = "card-body">
+						<form class=class="form-inline" role="form" th:action="${ActionUrl}" th:object = "${aspirant}" method="POST">
+						<input hidden type="text" name = "Role" th:value="${Role}" />
+						<table>
+						<tr th:if = "${Role != null}"><td>Köstatus:</td>
+						<td><select th:field = "*{koStatus}" class="form-control" placeholder="Ange köstatus">
+    						<option value="Aktiv">Aktiv</option>
+    						<option value="Vilande">Vilande</option>
+  							</select></td>
+  						</tr>
+  						<tr th:if = "${Role != null}">
+  						<td>Köplats:</td>
+  						<td><input type = "text" name = "Köplats"	th:field = "*{koPlats}" class = "form-control" placeholder="Köplats"/></td>
+  						</tr>
+  						<tr th:if = "${Role != null}">
+  						<td>Inskriven:</td>
+  						<td><input type = "text" name = "inskriven"	th:field = "*{inskriven}" class = "form-control" placeholder="Inskriven Datum"/></td>
+  						</tr>
+  						<tr th:if = "${Role != null}">
+  						<td>Betalat:</td>
+  						<td><input type = "text" name = "betalat"	th:field = "*{betalat}" class = "form-control" placeholder="Betalat Datum"/></td>
+  						</tr>	
+						<tr ><td>Förnamn:</td>
+						<td><input type = "text" name = "fnamn"	th:field = "*{fnamn}" class = "form-control" placeholder="Ange förnamn"/></td>
+						</tr>
+						<tr><td>Efternamn:</td> 
+						<td><input type = "text" name = "enamn"	th:field = "*{enamn}" class = "form-control" placeholder="Ange efternamn"/></td>
+						</tr>
+						<tr><td>E-postadress:</td>
+					    <td width="300"><input type = "text" name = "email"	th:field = "*{email}" class = "form-control" placeholder="Ange E-postadress"/></td>
+						</tr>
+						<tr><td>Telefonnummer:&nbsp;</td>
+						<td><input type = "text" name = "telefon" th:field = "*{telefon}" class = "form-control" placeholder="Ange telefonnummer"/><td>
+						</tr>
+						<tr><td>Adress:</td>
+						<td><input type = "text" name = "adress" th:field = "*{adress}" class = "form-control" placeholder="Ange gatuadress"/></td>
+						</tr>
+						<tr><td>Postnummer:</td>
+						<td><input type = "text" name = "postnr" th:field = "*{postnr}"	class = "form-control" placeholder="Ange postnummer"/></td>
+						</tr>
+						<tr><td>Postadress:</td>
+						<td><input type = "text" name = "postAdress" th:field = "*{postAdress}" class = "form-control" placeholder="Ange postadress"/></td>
+						</tr><tr><td><br></td><td></td></tr>
+						<tr><td></td><td><button type="submit" class = "btn btn-primary">Spara</button></td></tr>	
+					    </table>
+						</form>					
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 
+		<div class="container" align="center"> 
+		<form action="#" th:action="@{/saveAspirant}" th:object="${aspirant}" method="POST">
+			<input type="text" th:field="*{fnamn}"
+				placeholder="Förnamn" class="form-control mb-4 col-4">
+				
+				<input type="text" th:field="*{enamn}"
+				placeholder="Efternamn" class="form-control mb-4 col-4">
+				
+				<input type="text" th:field="*{email}"
+				placeholder="Email" class="form-control mb-4 col-4">
+				
+				<button type="submit" class="btn btn-info col-2"> Spara </button>
+		</form>  
+		 -->             
+	</div>
+</body></html>
+

@@ -1,0 +1,20 @@
+RUBRIK:Administrationsavgift Skrubba
+
+Avinr: #AVINR
+ 
+Din köplats är nu: #KOPLATS
+ 
+Hej #FORNAMN
+Det är nu dags att betala in årets administrationsavgift på 250 kr, om du inte redan hunnit göra det. 
+Avgiften ska finnas på vårt konto, Bg 5287-7172, senast den 28 februari om du vill behålla din plats. 
+Det är upp till dig själv att hålla reda på inbetalningen. Vi skickar inte ut några påminnelser. 
+Har avgiften inte kommit oss tillhanda senast 28 februari stryks du automatiskt bort från vår 
+intresselista och alla dina uppgifter raderas.
+ 
+Inbjudan till informationsträff finns i bifogade bilaga.
+ 
+ 
+Med vänlig hälsning
+Skrubba Koloniträdgårdsförening
+Ingrid Norfors
+Kassör

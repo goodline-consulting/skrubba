@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="se" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Meddelande</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" crossorigin="anonymous"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  </head>
+  <body style='background-color:white'>
+	
+    <div class="container ustify-content-center">
+    	<img th:src="@{/images/skrubbalogga.jpg}" class="img-rounded justify-content-center" alt="Skrubbas Logga">        
+        <p></p>
+        
+        <div sec:authorize="hasRole('ROLE_ADMIN')">
+        <div class = "row">			
+				<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center card">	
+					<div> 
+			        	<div class="alert alert-warning alert-dismissible fade show"  role="alert">
+			        		Ska du verkligen radera [[${aspirant.fnamn}]] från kön?<br>
+			        		Om du klickar på <strong>Radera</strong> kommer [[${aspirant.fnamn}]] plockas bort från kön och köordningen 
+			        		kommmer att räknas om.<br>
+			        		Klickar du på <strong>Avbryt</strong> så sker ingen radering ur kön.
+			        		
+			        	</div>
+       			    </div>				
+					<div class = "card-body">
+						<form class=class="form-inline" role="form" th:action="@{/aspirant/remove}" th:object = "${aspirant}" method="POST">
+						<input hidden type="text" name = "Role" th:value="${Role}" />
+						<input hidden type="text" name = "id" th:field = "*{id}"  />
+						<table>
+						<td>Köplats:</td>
+  						<td><input type = "text" name = "Köplats"	th:field = "*{koPlats}" class = "form-control" placeholder="Köplats"/></td>  						
+  						</tr>
+  						<tr th:if = "${Role != null}">
+  						<td>Inskriven:</td>
+  						<td><input type = "text" name = "inskriven"	th:field = "*{inskriven}" class = "form-control" placeholder="Inskriven Datum"/></td>
+  						</tr>  							
+						<tr ><td>Förnamn:</td>
+						<td><input type = "text" name = "fnamn"	th:field = "*{fnamn}" class = "form-control" placeholder="Ange förnamn"/></td>
+						</tr>
+						<tr><td>Efternamn:</td> 
+						<td><input type = "text" name = "enamn"	th:field = "*{enamn}" class = "form-control" placeholder="Ange efternamn"/></td>
+						</tr>
+						<tr><td>E-postadress:</td>
+					    <td width="300"><input type = "text" name = "email"	th:field = "*{email}" class = "form-control" placeholder="Ange E-postadress"/></td>
+						</tr>
+						<tr><td><br></td><td></td></tr>
+						<tr><td></td><td><button type="submit" class = "btn btn-primary">Radera</button><a th:href="${cancelUrl}" id="cancel" name="cancel" class="btn btn-default">Avbryt</a></td></tr>	
+					    </table>
+						</form>					
+					</div>
+				</div>
+			</div>
+                            
+         </div>
+        <!--  
+        <div th:if="${message != null}">	    
+	        <div class="alert alert-success" role="alert">[[${message}]]</div>
+	        <p></p>
+        	<p align="center"><a th:href="@{/aspirantlista}">Klart</a></p>
+		</div>	   
+		<div th:if="${error != null}" class="alert alert-danger" role="alert">[[${error}]]</div>
+		-->                
+	</div>
+</body></html>
+

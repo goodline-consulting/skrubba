@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="se" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Mail</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-duallistbox@3.0.6/dist/bootstrap-duallistbox.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap4-duallistbox/4.0.1/jquery.bootstrap-duallistbox.min.js"></script>
+	<style>
+		.modal.fade.modal-right .modal-dialog {
+  			transform: translate(125%, 0px);
+		}
+
+		.modal.show.modal-right .modal-dialog {
+  			transform: none;
+		}
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .file-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+        }
+
+        .remove-btn {
+            cursor: pointer;
+            color: red;
+            margin-left: 10px;
+        }
+                   
+        .loading-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+	</style>
+	
+  </head>
+  <body style='background-color:white'>
+  	 <form  th:action="@{/mailurval}" th:object="${emailForm}" id="urvalsform" method="post" onsubmit="validateForm(event)" enctype="multipart/form-data">	
+    <div class="container">
+    
+ 		<img th:src="@{/images/skrubbalogga.jpg}" class="img-rounded" alt="Skrubbas Logga">   
+      
+        <p></p>
+        <nav class="navbar navbar-expand-sm navbar-light bg-light">
+		  <ul class="navbar-nav mr-auto">
+		  	<li class="nav-item active">
+		      	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
+		    </li>
+		    	<button type="submit" class="btn btn-outline-success btn-sm">Skicka mail</button> 
+<!-- 		    	<button id="knapp" class="btn btn-primary mr-3"> Skicka mail</button> -->
+		    	<input type="hidden" name = "_urval"  id = "_urval" th:value="${_urval}" />
+		    	<input type="hidden" name = "_action" id = "_action" value="null" />        	    		
+	    		<li class="nav-item dropdown">
+	         		<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">Stugkö</a>
+	        		<ul class="dropdown-menu">
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='queue';document.getElementById('_action').value='urval';document.getElementById('urvalsform').submit()">Alla</a></li>
+	          			<li><hr class="dropdown-divider"></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='unpaid';document.getElementById('_action').value='urval';document.getElementById('urvalsform').submit()">Ej betalat</a></li>			          			
+	          			<li><hr class="dropdown-divider"></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='aktiva';document.getElementById('_action').value='urval';document.getElementById('urvalsform').submit()">Aktiva</a></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='vilande';document.getElementById('_action').value='urval';document.getElementById('urvalsform').submit()">Vilande</a></li>
+	          			<li><hr class="dropdown-divider"></li>	          				          			
+	          			<li th:each="Tillsalu : ${visningar}">
+	          				<a class="dropdown-item" href="#" th:attr="onclick='updateTillsalu(\'' + ${Tillsalu.lottnr} + '\')'">Visning lott [[${Tillsalu.lottnr}]]</a>
+	          			</li>
+	        		</ul>
+	      	  	</li>
+      	  		<li class="nav-item dropdown">
+	         		<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">Kolonister</a>
+	        		<ul class="dropdown-menu">
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='members';document.getElementById('urvalsform').submit()">Alla</a></li>
+	          			<li><hr class="dropdown-divider"></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='area1';document.getElementById('urvalsform').submit()">Område 1</a></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='area2';document.getElementById('urvalsform').submit()">Område 2</a></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='area3';document.getElementById('urvalsform').submit()">Område 3</a></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='area4';document.getElementById('urvalsform').submit()">Område 4</a></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='area5';document.getElementById('urvalsform').submit()">Område 5</a></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='area6';document.getElementById('urvalsform').submit()">Område 6</a></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='area7';document.getElementById('urvalsform').submit()">Område 7</a></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='area8';document.getElementById('urvalsform').submit()">Område 8</a></li>
+	        		</ul>
+	      	  	</li>
+	      	  	<li class="nav-item dropdown">
+	         		<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">Mallar</a>
+	        		<ul class="dropdown-menu">
+	        			<li th:each="brevmall : ${mallar}"> 
+	        				<a class="dropdown-item" href="#" th:attr="onclick='updateUrval(\'' + ${brevmall.namn} + '\')'">[[${brevmall.namn}]]</a>
+	        		    </li>	          			
+	        		</ul>
+	      	  	</li>
+	      	  	<a class="nav-link" data-toggle="modal" data-target="#newPage"><span class="fa fa-info-circle"></span>Hjälp</a>
+		  </ul>		 
+		  <ul class="nav navbar-nav ">		
+		  	  <li class="nav-item"><a class="nav-link" th:href="@{/}"><span class="fa fa-sign-in"></span> Tillbaka	</a></li>
+		  </ul>
+		</nav>		
+    </div>	  
+          
+    <div class="container">
+    <br>
+    <div class="loading-container" id="loadingContainer">
+    	<div class="loading-spinner"></div>
+   		<p>Sending mail...</p>
+     </div>
+    <div class="row g-3">
+	        <div class="col-sm-8 mb-2">
+    			<input type="text"  class="form-control" id="subject" name="subject" th:field="*{subject}" required placeholder="Mailets rubrik"/>
+    		</div>	
+    		<div class="input-group col-sm-4 mb-2 ">
+  				<div class="custom-file">
+    				<input type="file" class="custom-file-input" id="attachments" name="nybilaga" aria-describedby="inputGroupFileAddon01" th:field="*{attachments}" onchange="updateFileNameLabel()">
+    				<label class="custom-file-label" for="attachments">Bilagor</label>
+  				</div>
+ 		    	<div class="input-group-prepend">
+    				<span class="input-group-text" id="inputGroupFileAddon01" onclick="laddaBilaga();">Bifoga</span>
+ 			    </div>
+  				
+			</div>
+  		<div class="col-sm-8 mb-2">
+    			<textarea  class="form-control" id="body" name="body" th:field="*{body}" required rows="8" placeholder="Mailets innehåll">[[*{body}]]</textarea>
+    		</div>	
+    		<div class="col-sm-4 mb-2">
+				<table class="table table-striped table-bordered">
+		        
+		        <tbody>
+		            <tr th:each="bilaga, status : *{bilageLista}">
+		                <td th:text="${bilaga}"></td>		                
+		                <td width="5%"><span class="fa fa-trash-o" aria-hidden="true" th:attr="onclick='removeBilaga(\'' + ${status.index} + '\')'"></span></td>
+		            </tr>		            
+		        </tbody>
+		    </table>    		
+    		</div>						
+		</div>	
+		<div id="validationMessages" style="color:red;"> </div>		
+		<div th:if = "${aspirantlista != null}" class="row">
+			<div class="col-md-8 mt-2">
+				<select th:if = "${aspirantlista != null}" th:field="${urval.valda}" name="valda" multiple="multiple" id="dualListbox" size="15" th:attr="required=${aspReq}" class="form-select" >
+					<!-- Add your items here -->
+				    <option th:each="aspirant : ${aspirantlista}" th:value="${aspirant.id}" th:text="${aspirant.koPlats + ' ' + aspirant.fnamn + ' ' + aspirant.enamn}"></option>
+				</select>
+		    </div>		    
+		</div>		
+		<div th:if = "${kolonistlista != null}" class="row">
+		        <div class="col-md-8 mt-5">
+				    <select th:if = "${kolonistlista != null}" th:field="${urval.valda}" name="valda" multiple="multiple" id="dualListbox" size="15" th:attr="required=${kolloReq}" class="form-select" >
+				        <!-- Add your items here -->
+				        <option th:each="kolonilott : ${kolonistlista}" th:value="${kolonilott.lottnr}" th:text="${kolonilott.lottnr + ' ' + kolonilott.agare}"></option>
+				    </select>
+		       </div>
+		</div>				
+	</div>	
+	</form>	
+	
+	<div class="modal fade modal-right" id="newPage" tabindex="-1" role="dialog" aria-labelledby="newPage" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content">	     
+	      
+			<table class="table table-sm table-striped">
+				<thead><tr class="table-primary"><th scope="col" colspan="2">Följande symboler kan användas i brev till folk i kön</th></tr></thead>
+				 <tr><th scope="row">#AVINR</th><td>Ersätts med avinumret på senaste betalningsanmodan</td></tr>
+			     <tr><th scope="row">#KOPLATS</th><td>Ersätts med aspirantens köplats</td></tr> 	
+				 <tr><th scope="row">#BG</th><td>Ersätts med Skrubbas bankgironummer</td></tr>
+				 <tr><th scope="row">#KOAVGIFT</th><td>Ersätts med aktuell köavgift</td></tr>
+				 <tr><th scope="row">#BETALDATUM</th><td>Ersätts med datum köavgiften senast skall vara betald</td></tr>
+			</table>
+			<h4> </h4>
+			<table class="table table-sm table-striped">
+			<thead><tr class="table-warning"><th scope="col" colspan="2">Följande symboler kan användas i brev till kolonister</th></tr></thead>
+				 <tr><th scope="row">#LOTTNR</th><td>Ersätts med kolonistens lottnummer</td></tr>
+			     <tr><th scope="row">#OMRADE</th><td>Ersätts området kolonistens stuga tillhör</td></tr> 	
+			</table>
+			
+			<table class="table table-sm table-striped">
+				<thead><tr class="table-success"><th scope="col" colspan="2">Följande symboler kan användas i alla brev</th></tr></thead>
+				 <tr><th scope="row">#FORNAMN</th><td>Ersätts med personens förnamn</td></tr>
+			     <tr><th scope="row">#EFTERNAMN</th><td>Ersätts med personens efternamn</td></tr> 	
+				 <tr><th scope="row">#HELTNAMN</th><td>Ersätts med personens för och efternamn</td></tr>
+				 <tr><th scope="row">#EMAIL</th><td>Ersätts med personens emailadress</td></tr>
+				 <tr><th scope="row">#TELEFON</th><td>Ersätts med personens telefonnummer</td></tr>
+			</table>
+	      <div class="modal-footer">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">Stäng</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<script th:inline="javascript">
+		function laddaBilaga()
+		{		
+			if (document.getElementById('attachments').value == "")
+			{
+				alert("Du har inte valt någon bilaga!");
+				return;
+			}
+			document.getElementById('_action').value = 'bilaga';
+        	document.getElementById('urvalsform').submit();
+		}
+		function removeBilaga(nr)
+		{
+			document.getElementById('_action').value = 'remove' + nr;
+        	document.getElementById('urvalsform').submit();
+		}
+		function updateFileNameLabel() {
+	        // Get the selected file name
+	        var fileName = $('#attachments').val().split('\\').pop();
+	        // Update the label with the file name
+	        $('.custom-file-label').text(fileName);
+	    }
+    	function updateUrval(value) 
+    	{
+        	document.getElementById('_action').value = 'mall' + value;
+        	document.getElementById('urvalsform').submit();
+    	}
+    	function updateTillsalu(value) 
+    	{
+    		document.getElementById('_action').value = 'urval'
+        	document.getElementById('_urval').value = 'salu' + value;
+        	document.getElementById('urvalsform').submit();
+    	}
+    	function validateForm(event)
+    	{    		
+    		document.getElementById('_action').value='submit';
+    		var validationMessages = document.getElementById('validationMessages');
+    		var selects = document.querySelectorAll('.form-select');
+    		if (selects.length === 0) 
+            {
+               
+                validationMessages.innerHTML = "Du måste välja minst en mottagare av brevet!";
+                event.preventDefault();
+                return false; // Prevent form submission
+            }
+    		
+    		var selectedValues = document.getElementById("dualListbox").selectedOptions;
+    		
+    		
+            // Example: Check if at least one option is selected
+            if (selectedValues.length == 0) 
+            {
+            	validationMessages.innerHTML = "Du måste välja minst en mottagare av brevet!";
+                event.preventDefault();
+                return false; // Prevent form submission
+            }
+    		document.getElementById('loadingContainer').style.display = 'flex';
+    		return true;
+    	}
+    	document.addEventListener("DOMContentLoaded", function() {
+    	        var dualListbox = document.getElementById("dualListbox");
+    	        if (dualListbox) {
+    	            dualListbox.required = dualListbox.style.display !== "none";
+    	        }
+    	});
+
+   	    function updateRequiredAttribute() 
+   	    {
+   	        var dualListbox = document.getElementById("dualListbox");
+   	        if (dualListbox) {
+   	            dualListbox.required = dualListbox.style.display !== "none";
+   	        }
+   	    }     	 	
+	</script>
+	
+	<script>	
+			$("#dualListbox").bootstrapDualListbox();
+			
+	</script>	
+</body></html>
+
