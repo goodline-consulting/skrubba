@@ -80,7 +80,7 @@ public class AspirantController
 				visLista.put(asp.getId(), saluLista);
 			}	
 		}
-	  	//Aspirant aspirant = new Aspirant();
+
 		model.addAttribute("aspLista", aspLista);
 		model.addAttribute("visLista", visLista);
 		return "/aspirantlista.html";      
@@ -170,15 +170,16 @@ public class AspirantController
 			oldAspirant.setBetalat(aspirant.getBetalat());
 			oldAspirant.setInskriven(aspirant.getInskriven());
 			oldAspirant.setKoPlats(aspirant.getKoPlats());
+			oldAspirant.setKoStatus(aspirant.getKoStatus());
 		}	
 		oldAspirant.setPostAdress(aspirant.getPostAdress());
 		oldAspirant.setPostnr(aspirant.getPostnr());
 		oldAspirant.setTelefon(aspirant.getTelefon());
-		oldAspirant.setKoStatus(aspirant.getKoStatus());
+		
 		aspirantService.saveAspirant(oldAspirant);
 		System.out.print(oldStatus + " / " + aspirant.getKoStatus());
 		// vi kollar om statusen är ändrad. I så fall skall vi räkna om köplatsen koPlatsAktiv
-		if (oldStatus != aspirant.getKoStatus())
+		if (oldStatus != oldAspirant.getKoStatus())
 		{
 			List<Aspirant> aspLista = aspirantService.stuvaOmListan();
 		    System.out.println("Sorterar om listan");			
@@ -232,7 +233,7 @@ public class AspirantController
 			model.addAttribute("message", aspirant.getFnamn() + " " + aspirant.getEnamn() + " har plockats bort ifrån kön!");					
 		    List<Aspirant> aspLista = aspirantService.stuvaOmListan();		    
 			model.addAttribute("aspLista", aspLista);
-			return "/aspirantlista.html";      		    	
+			return aspirantLista(model);    		    	
 	}	
 	
 	private static String getSiteURL(HttpServletRequest request) 

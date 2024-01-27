@@ -24,7 +24,7 @@ import se.goodline.skrubba.repository.KoloniLottRepository;
 import se.goodline.skrubba.repository.UserRepository;
 
 @SpringBootApplication
-public class SkrubbaApplication // extends SpringBootServletInitializer  
+public class SkrubbaApplication extends SpringBootServletInitializer  
 {
 
 	@Autowired
