@@ -30,7 +30,7 @@
   
   <ul class="nav navbar-nav ">
       
-      <li th:if = "${lottnr == 0}"class="nav-item"><a class="nav-link" href="/"><span class="fa fa-sign-in"></span> Tillbaka</a></li>
+      <li th:if = "${lottnr == 0}"class="nav-item"><a class="nav-link" th:href="@{/}"><span class="fa fa-sign-in"></span> Tillbaka</a></li>
       <li th:if = "${lottnr > 0}"class="nav-item"><a class="nav-link" th:href="@{/kolonilott/edit/{lottnr}(lottnr=${lottnr})}"><span class="fa fa-sign-in"></span> Tillbaka</a></li>
     </ul> 
 </nav>

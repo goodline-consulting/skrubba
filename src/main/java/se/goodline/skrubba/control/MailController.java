@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletContext;
 
 import org.aspectj.weaver.loadtime.Options;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,12 +90,17 @@ public class MailController
 	@Autowired
 	ParamRepository paramRepo;
 	
+	@Autowired
+	ServletContext servletContext;
+	
 	@ModelAttribute("emailForm")
 	public EmailForm createEmailForm() {
 		EmailForm emailForm = new EmailForm(); 
 		emailForm.setBilageLista(new ArrayList<>()); // Initialize your object
 	    return emailForm;     
 	}
+	
+	FileUtils fu = new FileUtils();
 	
 	@GetMapping("/mail")
 	public String mainMailPage(@ModelAttribute("emailForm") EmailForm emailForm, Model model) 
@@ -211,7 +217,7 @@ public class MailController
 		{
 			try 
 			{
-				emailForm.getBilageLista().add(storeFile(emailForm.getAttachments()));
+				emailForm.getBilageLista().add(storeFile(emailForm.getAttachments(), "Spool"));
 			} 
 			catch (IOException e) 
 			{
@@ -277,14 +283,14 @@ public class MailController
 	
 	@GetMapping("/mail/mallar")
 	public String mainMallPage(@ModelAttribute("brevmall") Brevmall brevmall, Model model) 
-	{			
-		String[] bilageLista = FileUtils.scanBilagorFolder(paramRepo.findByParamName("Bilagor").get().getParamValue());
+	{				
+		String[] bilageLista = fu.scanBilagorFolder(paramRepo.findByParamName("Bilagor").get().getParamValue());
 		model.addAttribute("bilageLista", bilageLista);
 		model.addAttribute("valda", new boolean[bilageLista.length]);
 		model.addAttribute("mallar", mallRepo.findAll());
 		model.addAttribute("brevmall", new Brevmall());
 		model.addAttribute("mallkatalog", paramRepo.findByParamName("Bilagor").get().getParamValue());
-		Resource resource = new ClassPathResource("static/bilagor/Julklapp3_2023.pdf");
+		
 		
 	  	return "/mallar.html";      
 	} 
@@ -294,7 +300,7 @@ public class MailController
 	{		
 		Brevmall brevmall = mallRepo.findById(id).get();
 	
-		String[] bilageLista = FileUtils.scanBilagorFolder(paramRepo.findByParamName("Bilagor").get().getParamValue());
+		String[] bilageLista = fu.scanBilagorFolder(paramRepo.findByParamName("Bilagor").get().getParamValue());
 		model.addAttribute("bilageLista", bilageLista);
 		boolean[] valda = getValdaBilagor(bilageLista, brevmall.getBilagor());
 		model.addAttribute("valda", valda);
@@ -318,11 +324,6 @@ public class MailController
 	@PostMapping("/mail/save/mall")
 	public String saveMall(@RequestParam int id, @RequestParam(name = "bilageval", required = false) String[] valdaBilagor, @ModelAttribute("brevmall") Brevmall brevmall, Model model) 
 	{		
-		System.out.println("ID:" + brevmall.getId());
-//		for (String bilaga : valdaBilagor)
-//		{
-//			System.out.println("vALD:" + bilaga);
-//		}
 		if (valdaBilagor != null)
 			brevmall.setBilagor(valdaBilagor);
 		mallRepo.save(brevmall);		
@@ -332,7 +333,7 @@ public class MailController
 	@GetMapping("/bilagor")
 	public String bilagor(Model model) 
 	{		
-		String[] bilageLista = FileUtils.scanBilagorFolder(paramRepo.findByParamName("Bilagor").get().getParamValue());
+		String[] bilageLista = fu.scanBilagorFolder(paramRepo.findByParamName("Bilagor").get().getParamValue());
 		model.addAttribute("bilagor", bilageLista);
 	  	return "/bilagor.html";      
 	} 
@@ -340,13 +341,17 @@ public class MailController
 	@PostMapping("/mail/delete/bilaga")
 	public String raderaBilagor(@RequestParam(name = "bilageval", required = false) String[] valdaBilagor, Model model)
 	{
-		String bilagefolder = paramRepo.findByParamName("Bilagor").get().getParamValue();
+		//String bilagefolder = paramRepo.findByParamName("Bilagor").get().getParamValue();
+		Resource resource = new ClassPathResource(paramRepo.findByParamName("Bilagor").get().getParamValue());
+		
+		
 		
 		if (valdaBilagor != null)
 			for (String bilaga : valdaBilagor)
 			{
 				try 
-				{	                
+				{	             
+					String bilagefolder  = resource.getURI().getPath();
 	                Path filePath = Paths.get(bilagefolder, bilaga);
 	                Files.delete(filePath);
 	            } 
@@ -355,7 +360,7 @@ public class MailController
 					model.addAttribute("message", "Ett fel inträffade vid radering av " + bilaga + ": " + e.getMessage());
 	            }
 			}
-		String[] bilageLista = FileUtils.scanBilagorFolder(bilagefolder);
+		String[] bilageLista = fu.scanBilagorFolder(paramRepo.findByParamName("Bilagor").get().getParamValue());
 		model.addAttribute("bilagor", bilageLista);
 		return "/bilagor.html"; 
 	}
@@ -366,17 +371,19 @@ public class MailController
 		String fileName = file.getOriginalFilename();
 		try 
 		{
-			file.transferTo(new File(paramRepo.findByParamName("Bilagor").get().getParamValue() + "/" + fileName));
+			//file.transferTo(new File(paramRepo.findByParamName("Bilagor").get().getParamValue() + "/" + fileName));
 			
 			//model.addAttribute("bilagor", bilageLista);      
-			model.addAttribute("message", "Bilaga " + fileName + " är uppladdad");
+			model.addAttribute("message", "Bilaga " + storeFile(file, "bilagor") + " är uppladdad");
 			
 		} 
 		catch (Exception e) 
 		{			
 			model.addAttribute("message", "Ett fel inträffade vid uppladdning av " + fileName + ": " + e.getMessage());			
 		} 		
-		String[] bilageLista = FileUtils.scanBilagorFolder(paramRepo.findByParamName("Bilagor").get().getParamValue());
+		//String[] bilageLista = fu.scanBilagorFolder(servletContext.getRealPath("/WEB-INF/classes/" + paramRepo.findByParamName("Bilagor").get().getParamValue()));
+		
+		String[] bilageLista = fu.scanBilagorFolder(paramRepo.findByParamName("Bilagor").get().getParamValue());
 		model.addAttribute("bilagor", bilageLista); 
 		return "/bilagor.html";
 	}
@@ -397,14 +404,19 @@ public class MailController
 		}		
 		return valda;
 	}
-	private String storeFile(MultipartFile file) throws IOException 
-	{
-        String originalFilename = file.getOriginalFilename();
-        String filePath = paramRepo.findByParamName("Spool").get().getParamValue() + "/" + originalFilename;
-        File destinationFile = new File(filePath);
-        file.transferTo(destinationFile);
-        
-        return originalFilename;
+	private String storeFile(MultipartFile file, String folder) throws IOException 
+	{				 
+		 Resource resource = new ClassPathResource(paramRepo.findByParamName(folder).get().getParamValue());
+		 //String basePath = servletContext.getRealPath("/WEB-INF/classes/" + paramRepo.findByParamName(folder).get().getParamValue());
+         File uploadDir = resource.getFile();
+//        
+//         if (!uploadDir.exists()) {
+//             uploadDir.mkdirs();
+//         }
+         
+         File uploadFile = new File(uploadDir, file.getOriginalFilename());
+         file.transferTo(uploadFile);
+	     return file.getOriginalFilename();
     }
 	
 }
