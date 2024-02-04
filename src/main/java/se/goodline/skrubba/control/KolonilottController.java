@@ -122,7 +122,7 @@ public class KolonilottController
 		{
 			if (!koloniLoader.loadKolonier(file.getInputStream()))
 			{
-				model.addAttribute("message", "Fel vid läsning av filen från medlemsregistret, Undersök filens!");
+				model.addAttribute("message", "Fel vid läsning av filen från medlemsregistret, Undersök files!");
 				return koloniLista(model);
 			}
 		} 
@@ -136,14 +136,19 @@ public class KolonilottController
 		for (Kolonilott lott : lottList)
 		{			
 			Kolonilott orgLott = lottRepo.getById(lott.getLottnr());
-			orgLott.setAgare(lott.getAgare());
-			orgLott.setEmail(lott.getEmail());
-			orgLott.setHemadress(lott.getHemadress());
-			orgLott.setLgh(lott.getLgh());
-			orgLott.setPostnr(lott.getPostnr());
-			orgLott.setPostort(lott.getPostort());
-			orgLott.setTelefon(lott.getTelefon());
-			lottRepo.save(orgLott);				
+			if (orgLott != null)
+			{
+				orgLott.setAgare(lott.getAgare());
+				orgLott.setEmail(lott.getEmail());
+				orgLott.setHemadress(lott.getHemadress());
+				orgLott.setLgh(lott.getLgh());
+				orgLott.setPostnr(lott.getPostnr());
+				orgLott.setPostort(lott.getPostort());
+				orgLott.setTelefon(lott.getTelefon());
+				lottRepo.save(orgLott);		
+			}
+			else		
+				lottRepo.save(lott);
 			//System.out.println(orgLott.toString());			
 		}
 		model.addAttribute("message", "Registret är uppdaterat!");

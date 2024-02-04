@@ -2,15 +2,30 @@ package se.goodline.skrubba.utils;
 
 import java.io.File;
 import java.util.Arrays;
-
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import se.goodline.skrubba.repository.ParamRepository;
 
 public class FileUtils 
 {
 	 
-	 public static String[] scanBilagorFolder(String folderName) 
+	 public  String[] scanBilagorFolder(String folderName) 
 	 {
-	        File folder = new File(folderName);
+		 
+		 	Resource resource = new ClassPathResource(folderName);
+		 	File folder = null;
+	        // Get the file from the resource
+	        
+			try 
+			{
+				folder = resource.getFile();
+				//System.out.println(folder.getAbsolutePath());
+			} 
+			catch (Exception e) 
+			{
+				
+				e.printStackTrace();
+			}
 	        File[] files = folder.listFiles();
 
 	        if (files != null) {
