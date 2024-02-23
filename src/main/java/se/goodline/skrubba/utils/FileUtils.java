@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import se.goodline.skrubba.repository.ParamRepository;
+
 
 public class FileUtils 
 {

@@ -93,7 +93,7 @@ public class AspirantController
 	  	aspirant.setKoPlats(aspirantService.getNextKoPlats() + 1);
 		model.addAttribute("aspirant", aspirant);
 		model.addAttribute("Role", "ROLE_ADMIN");
-		model.addAttribute("ActionUrl", "/aspirant/new");	
+		model.addAttribute("ActionUrl", "new");	
 		return "/edit_aspirant.html";      
 	}  
 	
@@ -107,7 +107,7 @@ public class AspirantController
 			model.addAttribute("message", "Det finns redan en person med email adress" + aspirant.getEmail() + "!");
 			model.addAttribute("aspirant", aspirant);
 			model.addAttribute("Role", "ROLE_ADMIN");
-			model.addAttribute("ActionUrl", "/aspirant/new");	
+			model.addAttribute("ActionUrl", "new");	
 			return "/edit_aspirant.html"; 
 		}
 		//EmailService emailService = new EmailService();
@@ -125,7 +125,7 @@ public class AspirantController
             model.addAttribute("message", "Ett fel uppstod när personen skulle registreras\n" + ex.getMessage());
             model.addAttribute("aspirant", aspirant);
 			model.addAttribute("Role", "ROLE_ADMIN");
-			model.addAttribute("ActionUrl", "/aspirant/new");	
+			model.addAttribute("ActionUrl", "new");	
 			return "/edit_aspirant.html"; 
         } 
     	catch (MessagingException | UnsupportedEncodingException e) 
@@ -133,7 +133,7 @@ public class AspirantController
             model.addAttribute("message", "Ett fel uppstod när e-post skulle skickas\n" + e.getMessage());
             model.addAttribute("aspirant", aspirant);
 			model.addAttribute("Role", "ROLE_ADMIN");
-			model.addAttribute("ActionUrl", "/aspirant/new");	
+			model.addAttribute("ActionUrl", "new");	
 			return "/edit_aspirant.html"; 
         }
         
@@ -149,9 +149,10 @@ public class AspirantController
     	if (user.get().getRoles().compareTo("ROLE_ADMIN") == 0)
     		model.addAttribute("Role", "ROLE_ADMIN");
 		model.addAttribute("aspirant", aspirantService.getAspirantById(id));	
-		model.addAttribute("ActionUrl", "/aspirant/edit/" + id);
+		model.addAttribute("ActionUrl", "edit");
 		return "/edit_aspirant";
 	}
+	
 	@PostMapping("/aspirant/edit/{id}")
 	public String editAspirantForm(@PathVariable int id, @ModelAttribute("aspirant") Aspirant aspirant,	@RequestParam("Role") String Role, Model model) 
 	{
@@ -171,6 +172,7 @@ public class AspirantController
 			oldAspirant.setInskriven(aspirant.getInskriven());
 			oldAspirant.setKoPlats(aspirant.getKoPlats());
 			oldAspirant.setKoStatus(aspirant.getKoStatus());
+			oldAspirant.setUtbildad(aspirant.getUtbildad());
 		}	
 		oldAspirant.setPostAdress(aspirant.getPostAdress());
 		oldAspirant.setPostnr(aspirant.getPostnr());
@@ -201,15 +203,18 @@ public class AspirantController
 	public String showPasswordForm(@PathVariable int id, Model model) 
 	{
 		model.addAttribute("id", id);
+		model.addAttribute("action", "/aspirant/change_password");
     	return "/change_password";	
-	} 
+	}
+	
 	@PostMapping("/aspirant/change_password")
 	public String changePasswordForm(HttpServletRequest request, Model model) 
 	{
 		    int id = Integer.parseInt(request.getParameter("id"));
 		    userService.updatePassword(id, request.getParameter("password"));
 		    Aspirant aspirant = aspirantService.getAspirantById(id);
-		    model.addAttribute("aspirant", aspirant);						
+		    model.addAttribute("aspirant", aspirant);
+		    
 	    	return "/userpage";	
 	}	
 	

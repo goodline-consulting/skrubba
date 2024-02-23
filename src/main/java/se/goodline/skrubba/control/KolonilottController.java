@@ -135,17 +135,18 @@ public class KolonilottController
 		ArrayList<Kolonilott> lottList = koloniLoader.getLotter();		
 		for (Kolonilott lott : lottList)
 		{			
-			Kolonilott orgLott = lottRepo.getById(lott.getLottnr());
-			if (orgLott != null)
+		
+			Optional <Kolonilott> orgLott = lottRepo.findById(lott.getLottnr());
+			if (orgLott.isPresent())
 			{
-				orgLott.setAgare(lott.getAgare());
-				orgLott.setEmail(lott.getEmail());
-				orgLott.setHemadress(lott.getHemadress());
-				orgLott.setLgh(lott.getLgh());
-				orgLott.setPostnr(lott.getPostnr());
-				orgLott.setPostort(lott.getPostort());
-				orgLott.setTelefon(lott.getTelefon());
-				lottRepo.save(orgLott);		
+				orgLott.get().setAgare(lott.getAgare());
+				orgLott.get().setEmail(lott.getEmail());
+				orgLott.get().setHemadress(lott.getHemadress());
+				orgLott.get().setLgh(lott.getLgh());
+				orgLott.get().setPostnr(lott.getPostnr());
+				orgLott.get().setPostort(lott.getPostort());
+				orgLott.get().setTelefon(lott.getTelefon());
+				lottRepo.save(orgLott.get());		
 			}
 			else		
 				lottRepo.save(lott);

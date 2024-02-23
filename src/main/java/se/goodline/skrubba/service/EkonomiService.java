@@ -14,15 +14,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import javax.mail.MessagingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import se.goodline.skrubba.model.Aspirant;
 import se.goodline.skrubba.model.Betalning;
+import se.goodline.skrubba.model.Brevmall;
+import se.goodline.skrubba.model.EmailForm;
 import se.goodline.skrubba.model.Kolonilott;
 import se.goodline.skrubba.model.Param;
 import se.goodline.skrubba.repository.AspirantRepository;
 import se.goodline.skrubba.repository.BetalningRepository;
+import se.goodline.skrubba.repository.BrevmallRepository;
 import se.goodline.skrubba.repository.KoloniLottRepository;
 import se.goodline.skrubba.repository.ParamRepository;
 import se.goodline.skrubba.repository.VisningRepository;
@@ -46,24 +53,95 @@ public class EkonomiService
 	@Autowired
 	private KoloniLottRepository lottRepo;
 	
+	@Autowired
+	private BrevmallRepository mallRepo;
 	
+	@Autowired
+	private EmailService mailService;
+	
+	@Autowired
+	EmailParser emp;
+	
+	@Async
 	public void fakturera()
 	{
-		List<Aspirant> aspLista = aspirantRepo.findAll();
+		List<Aspirant> aspLista = aspirantRepo.findAll(Sort.by("koPlats"));		
+		Optional<Param> paramOpt = paramRepo.findByParamName("Fakturaprocess");
+		Param par = null;		
+		if (paramOpt.isEmpty())
+		{
+			par = new Param("Fakturaprocess", "Startad");
+		}
+		else par = paramOpt.get();
 		
-		
+		Brevmall mallAktiv = mallRepo.findByNamn("köavgift");
+		Brevmall mallPassiv =  mallRepo.findByNamn("köavgift_passiva");
+		EmailForm em = null;
+		int antal = 0;
+		int maxAntal = 20;
+		int totAntal = 0;
+		int antBet = 0;
 		for (Aspirant asp : aspLista)
 		{	
+			Optional<Betalning> bet = betRepo.findThisYear(asp.getId(), Year.now().getValue());
+			
 			try 
 			{
-				createBetalning(asp.getId(), Year.now().getValue());
+				if (bet.isEmpty())
+				{	
+					antBet++;
+					createBetalning(asp.getId(), Year.now().getValue());
+					bet = betRepo.findThisYear(asp.getId(), Year.now().getValue());	
+				}	
+				if (bet.get().getMailat() == null)
+				{
+					antal++;
+					totAntal ++;
+					// Vi får bara skicka max 20 mail i taget så vi måte vänta här i fem minuter					
+					if (antal > maxAntal)
+					{
+						par.setParamValue("Skapat " + antBet + " betalposter, skickat " + (totAntal - 1) + " brev, Pausar");
+						paramRepo.save(par);						
+						Thread.sleep(5 * 60 * 1000);
+						antal = 1;
+						//return;
+					}
+					
+					if (asp.getKoStatus().equals("Aktiv"))						
+						em = new EmailForm(mallAktiv);
+					    
+					else
+						em = new EmailForm(mallPassiv);
+					em = emp.parseAspEmailForm(em, asp);
+					
+					System.out.println("Skickar mail till " + asp.getEmail() + " på köplats " + asp.getKoPlats() + " med status " + asp.getKoStatus());
+					mailService.sendEmail(asp.getEmail(), em);
+					bet.get().setMailat(new Date());
+					betRepo.save(bet.get());
+					
+				}
             } 
 			catch (DataAccessException e) 
 			{            
 				System.err.println("Betalning finns redan för " + asp.getFnamn() + " " + asp.getEnamn() + " med id: " + asp.getId());
-				//e.printStackTrace();
+				
+			} 
+			catch (MessagingException e) 
+			{
+				System.err.println(e.getMessage());				
+			} 
+			catch (IOException e) 
+			{			
+				System.err.println(e.getMessage());
+			} 
+			catch (InterruptedException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}	
          }
+		par.setParamValue("Skapat " + antBet + " betalposter, skickat " + totAntal + " brev, Klar!");
+		paramRepo.save(par);
 	}
     public void createBetalning(int asp, int ar)
     {

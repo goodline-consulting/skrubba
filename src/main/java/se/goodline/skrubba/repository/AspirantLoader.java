@@ -5,6 +5,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -40,13 +42,11 @@ public class AspirantLoader
 			
 			
 				while ((line = reader.readLine()) != null)
-				{
-					
-					
+				{										
 					lineCols = line.split(";");
 					if (lineCols[POS_EMAIL].equals(""))
 						continue;
-										
+					System.out.println(line);				
 					Aspirant aspirant   = new Aspirant();
 					
 					aspirant.setKoPlats(Integer.parseInt(lineCols[POS_KOPLATS]));
@@ -59,7 +59,9 @@ public class AspirantLoader
 					if (lineCols.length == POS_TELEFON)
 						continue;
 					aspirant.setTelefon(lineCols[POS_TELEFON].equals("") ? lineCols[POS_TELHEM] : lineCols[POS_TELEFON]);
-					// aspirant.setKoStatus(lineCols[POS_AKTIV].equals("Ja") ? "Aktiv" : "Vilande");
+					aspirant.setKoStatus(lineCols[POS_AKTIV].equals("1") ? "Aktiv" : "Vilande");
+					if (aspirant.getKoStatus().equals("Aktiv"))
+						aspirant.setUtbildad(new SimpleDateFormat("yyyy-MM-dd").parse("2023-06-06"));
 					// aspirant.setInskriven(new Date(lineCols[POS_INSKRIVEN]));
 					
 					aspirantLista.add(aspirant);
@@ -71,6 +73,9 @@ public class AspirantLoader
 		} 
 		catch (NumberFormatException | IOException e) 
 		{
+			System.out.println(e.getMessage());
+			return false;
+		} catch (ParseException e) {
 			System.out.println(e.getMessage());
 			return false;
 		}	

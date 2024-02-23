@@ -26,7 +26,7 @@ public class EmailForm
 		this.bilageLista = new ArrayList<String>();
 		for (String bilaga : mall.getBilagor())
     	{
-    		this.getBilageLista().add("_" + bilaga);
+    		this.bilageLista.add("_" + bilaga);
     	}		
 	}
 	public MultipartFile getAttachments() {

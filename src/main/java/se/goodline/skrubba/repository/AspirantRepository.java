@@ -25,8 +25,15 @@ public interface AspirantRepository extends JpaRepository<Aspirant, Integer> {
     @Query(value = "SELECT * FROM aspirant p where ko_status = 'Aktiv' order by ko_plats", nativeQuery=true)
     public List<Aspirant> findByActive();
     
-    @Query(value = "SELECT * FROM aspirant p where ko_status = 'Vilande' order by ko_plats", nativeQuery=true)
+    @Query(value = "SELECT * FROM aspirant p where ko_status = 'Passive' order by ko_plats", nativeQuery=true)
     public List<Aspirant> findByPassive();
+    
+    @Query(value = "SELECT * FROM aspirant p where ko_status = 'Vilande' order by ko_plats", nativeQuery=true)
+    public List<Aspirant> findByVilande();
+    
+    @Query(value = "SELECT * FROM aspirant p where ko_status != 'Aktiv' order by ko_plats", nativeQuery=true)
+    public List<Aspirant> findByEjAktiva();
+
     
     @Query(value = "SELECT * FROM aspirant JOIN visning ON aspirant.id = visning.asp JOIN tillsalu  ON visning.id = tillsalu.id and tillsalu.saljdatum is null WHERE tillsalu.lottnr = ?1 order by ko_plats", nativeQuery=true)
     public List<Aspirant> findByInvitedToSail(int lottnr);

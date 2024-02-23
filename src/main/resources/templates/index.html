@@ -21,10 +21,15 @@
   <ul class="navbar-nav mr-auto">
   	<li class="nav-item active">
       	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
-    </li>      
-    <li class="nav-item">
-      <a class="nav-link" th:href="@{/params/}"><span class="fa fa-cog"></span>Inställningar</a>
-    </li>
+    </li>  
+    <li class="nav-item dropdown">
+   		<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false"><span class="fa fa-cog"></span>Underhåll</a>
+  		<ul class="dropdown-menu">
+  			<li><a class="dropdown-item" th:href="@{/params}">Inställningar</a></li>
+  			<li><a class="dropdown-item" th:href="@{/logg}">Logg</a></li>	
+  			<li><a class="dropdown-item" th:href="@{/admin/change_password/{id}(id=${admin.id})}">Byt lösenord</a></li>    			        			
+  		</ul>
+	</li>    
     <li class="nav-item">
       <a class="nav-link" th:href="@{/aspirantlista}"><i class="fa fa-female" aria-hidden="true"></i><i class="fa fa-male" aria-hidden="true"></i>Visa kö</a>
     </li>

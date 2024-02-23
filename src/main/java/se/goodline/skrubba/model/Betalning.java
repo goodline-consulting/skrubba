@@ -21,7 +21,7 @@ public class Betalning implements Serializable
     private int ar;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date betdatum;
-    
+    private Date mailat;
     
     
 	public int getId() {
@@ -63,17 +63,25 @@ public class Betalning implements Serializable
 	public void setBetdatum(Date betDatum) {
 		this.betdatum = betDatum;
 	}
+	
+	public Date getMailat() {
+		return mailat;
+	}
+
+	public void setMailat(Date mailat) {
+		this.mailat = mailat;
+	}
 
 	@Override
 	public String toString() {
-		return "Betalning [id=" + id + ", Asp=" + asp + ", Summa=" + summa + ", ar=" + ar + ", betDatum=" + betdatum + "]";
+		return "Betalning [id=" + id + ", Asp=" + asp + ", Summa=" + summa + ", ar=" + ar + ", betDatum=" + betdatum + ", mailat=" + mailat + "]";
 	}
 
 	public Betalning() {
 		super();
 	}
 
-	public Betalning(int id, int asp, int summa, int ar, Date betDatum) 
+	public Betalning(int id, int asp, int summa, int ar, Date betDatum, Date mailat) 
 	{
 		super();
 		this.id  = id;

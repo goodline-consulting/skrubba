@@ -36,11 +36,11 @@ public class EmailParser
 			if (param.isPresent())
 				resStr = resStr.replace("#BG", param.get().getParamValue());
 		}
-		if (str.contains("#KOAVGIFT"))
+		if (str.contains("#KÖAVGIFT"))
 		{	
 			param = paramRepo.findByParamName("Köavgift");
 			if (param.isPresent())
-				resStr = resStr.replace("#KOAVGIFT", param.get().getParamValue());
+				resStr = resStr.replace("#KÖAVGIFT", param.get().getParamValue());
 		}
 		if (str.contains("#BETALDATUM"))
 		{	
@@ -67,8 +67,9 @@ public class EmailParser
 		Optional<Betalning> bet = betRepo.findUnPaidThisYear(asp.getId(), LocalDate.now().getYear());
 		String resStr = new String(str);
 		resStr = resStr.replace("#AVINR", "" + (bet.isPresent() ? bet.get().getId() : "#AVINR"));
-		resStr = resStr.replace("#KOPLATS","" + asp.getKoPlats());
-		resStr = resStr.replace("#FORNAMN", asp.getFnamn());
+		resStr = resStr.replace("#KÖPLATS","" + asp.getKoPlats());
+		resStr = resStr.replace("#KÖSTATUS","" + asp.getKoStatus());
+		resStr = resStr.replace("#FÖRNAMN", asp.getFnamn());
 		resStr = resStr.replace("#EFTERNAMN", asp.getEnamn());
 		resStr = resStr.replace("#HELTNAMN", asp.getFnamn() +  " " + asp.getEnamn());
 		resStr = resStr.replace("#EMAIL", asp.getEmail() != null ? asp.getEmail() : "#EMAIL");
@@ -89,7 +90,7 @@ public class EmailParser
 			return str;
 		String resStr = new String(str);
 		
-		resStr = resStr.replace("#FORNAMN", lott.getAgare().split(" ")[0]);
+		resStr = resStr.replace("#FÖRNAMN", lott.getAgare().split(" ")[0]);
 		resStr = resStr.replace("#EFTERNAMN", lott.getAgare().split(" ")[1]);
 		resStr = resStr.replace("#HELTNAMN", lott.getAgare());
 		resStr = resStr.replace("#EMAIL", lott.getEmail() != null ? lott.getEmail() : "#EMAIL");
@@ -106,13 +107,16 @@ public class EmailParser
 		String newFooter  = null;
 		
 		if (em.getSubject() != null)
-			newSubject = replaceTokens(em.getSubject(), asp);
+			//newSubject = replaceTokens(em.getSubject(), asp);
+			em.setSubject(replaceTokens(em.getSubject(), asp));
 		if (em.getBody() != null)
-			newBody    = replaceTokens(em.getBody(), asp);
+			//newBody    = replaceTokens(em.getBody(), asp);
+			em.setBody(replaceTokens(em.getBody(), asp));
 		if (em.getFooter() != null)
-			newFooter  = replaceTokens(em.getFooter(), asp);
-		
-		return new EmailForm(newSubject, newBody, newFooter, em.getAttachments());
+			//newFooter  = replaceTokens(em.getFooter(), asp);
+			em.setFooter(replaceTokens(em.getFooter(), asp));	
+		//return new EmailForm(newSubject, newBody, newFooter, em.getAttachments());
+		return em;
 	}
 	EmailForm parseLottEmailForm(EmailForm em, Kolonilott lott)
 	{
@@ -121,11 +125,14 @@ public class EmailParser
 		String newFooter  = null;
 		
 		if (em.getSubject() != null)
-			newSubject = replaceTokens(em.getSubject(), lott);
+			em.setSubject(replaceTokens(em.getSubject(), lott));
+			//newSubject = replaceTokens(em.getSubject(), lott);
 		if (em.getBody() != null)
-			newBody    = replaceTokens(em.getBody(), lott);
+			em.setBody(replaceTokens(em.getBody(), lott));
+			//newBody    = replaceTokens(em.getBody(), lott);
 		if (em.getFooter() != null)
-			newFooter  = replaceTokens(em.getFooter(), lott);
+			em.setFooter(replaceTokens(em.getFooter(), lott));
+			//newFooter  = replaceTokens(em.getFooter(), lott);
 		
 		return new EmailForm(newSubject, newBody, newFooter, em.getAttachments());
 	}

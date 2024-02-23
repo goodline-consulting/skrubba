@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import se.goodline.skrubba.model.Aspirant;
 import se.goodline.skrubba.model.Betalning;
@@ -55,7 +56,7 @@ public class BetalningsController
 		
 		model.addAttribute("aspnamn", asp.getFnamn() + " " + asp.getEnamn());
 		model.addAttribute("betallista", betalLista);
-		model.addAttribute("ny_betalning", new Betalning(0, asp.getId(),Integer.parseInt(paramRepo.findByParamName("Köavgift").get().getParamValue()), Year.now().getValue(), new Date()));
+		model.addAttribute("ny_betalning", new Betalning(0, asp.getId(),Integer.parseInt(paramRepo.findByParamName("Köavgift").get().getParamValue()), Year.now().getValue(), new Date(), null));
 		return "/aspbetalningar.html";      
 	}  
 	@PostMapping("/betalning/registrera/{id}")
@@ -111,22 +112,29 @@ public class BetalningsController
 	}
 	
 	@PostMapping("/betalning/ny")
-	public String saveBetalning(@ModelAttribute("ny_betalning") Betalning betalning, Model model) 
+	public String saveBetalning(@ModelAttribute("ny_betalning") Betalning betalning, @RequestParam int summa, Model model) 
 	{			
 		try
 		{
+			betalning.setSumma(summa);
+			Aspirant asp = aspRepo.findById(betalning.getAsp());
+			asp.setBetalat(betalning.getBetdatum());
 			betRepo.save(betalning);
+			Brevmall bm = mallRepo.findByNamn("Betalningsbekräftelse");
+			EmailForm em = new EmailForm(bm);
+			emailService.sendBetalningsBekraftelse(em, asp);
 		}
 		catch (Exception e) 
 		{
-			model.addAttribute("message", "Det finns redan en betalning registrerad för år " + betalning.getAr() + "!");
+			model.addAttribute("message", "Det finns redan en betalning registrerad för år " + betalning.getAr() + "!" + e.getMessage());
 		}
 		return editVisningUrval(betalning.getAsp(), model);
 	}	
 	
 	@PostMapping("/betalning/delete/{id}")
 	public ResponseEntity<String> deleteBetalning(@PathVariable int id, Model model) 
-	{				
+	{		
+		System.out.println("tar bort betalning");
 		Optional<Betalning> bet = betRepo.findById(id);
 		betRepo.delete(bet.get());
 		return ResponseEntity.ok("{\"message\": \"Betalningen borttagen\"}"); // "redirect:/betalning/lista/" + bet.get().getAsp();		

@@ -10,9 +10,11 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.InputStreamSource;
+import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -84,8 +86,14 @@ public class EmailService
         mailSender.send(message);
        
     }  
-	private void sendEmail(String recipientEmail, EmailForm em) throws UnsupportedEncodingException, MessagingException
+	public void sendEmail(String recipientEmail, EmailForm em) throws MessagingException, IOException
 	{
+		String folder = null;
+		if (recipientEmail.contains("noemail.se"))
+		{	
+			System.out.println("Saknar riktig emailadress:" + recipientEmail);
+			return;			
+		}	
 		String mailMottagare = paramRepo.findByParamName("Mailmottagare").isPresent() ? paramRepo.findByParamName("Mailmottagare").get().getParamValue() : recipientEmail;
 		MimeMessage message = mailSender.createMimeMessage();              
         MimeMessageHelper helper = new MimeMessageHelper(message, true);                       
@@ -95,12 +103,19 @@ public class EmailService
         helper.setSubject(em.getSubject());         
         helper.setText(em.getBody(), false); 
         for (String attachment : em.getBilageLista()) 
-        {
-        	File attachmentFile = new File(attachment.startsWith("_") ? paramRepo.findByParamName("Bilagor").get().getParamValue() + "/" + attachment.substring(1) : paramRepo.findByParamName("Spool").get().getParamValue() + "/" + attachment);
-            FileSystemResource fileSystemResource = new FileSystemResource(attachmentFile);
+        {        
+        	if (attachment.startsWith("_"))
+        		folder = paramRepo.findByParamName("Bilagor").get().getParamValue() + "/" + attachment.substring(1);
+        	else
+        		folder = paramRepo.findByParamName("Spool").get().getParamValue() + "/" + attachment;
+        	
+        	Resource resource = new ClassPathResource(folder);
+        	        	
+        	File attachmentFile = resource.getFile();
+        	FileSystemResource fileSystemResource = new FileSystemResource(attachmentFile);            
             helper.addAttachment(attachmentFile.getName(), fileSystemResource);
         }
-        System.out.println("Skickar mail till:" + mailMottagare);
+        //System.out.println(em.getBody());
         mailSender.send(message);
 	}
 	
@@ -132,6 +147,7 @@ public class EmailService
 		emNy.setBilageLista(em.getBilageLista());
 		sendEmail(asp.getEmail(), emNy);
 	}
+	
 	
 	
 	

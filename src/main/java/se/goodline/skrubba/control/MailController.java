@@ -130,7 +130,9 @@ public class MailController
 		        case "queue":	        			        	
 		        case "unpaid":	        	        	
 		        case "aktiva":
-		        case "vilande":		       
+		        case "vilande":	
+		        case "passiva":
+		        case "ejaktiva":	
 		        	aspOrKollo = true;
 		        	break;
 		        case "members":			        	
@@ -253,9 +255,15 @@ public class MailController
 	        case "aktiva":
 	        	model.addAttribute("aspirantlista", aspRepo.findByActive());
 	        	break;
-	        case "vilande":
+	        case "passiva":
 	        	model.addAttribute("aspirantlista", aspRepo.findByPassive());
 	        	break;	
+	        case "vilande":
+	        	model.addAttribute("aspirantlista", aspRepo.findByVilande());
+	        	break;	
+	        case "ejaktiva":
+	        	model.addAttribute("aspirantlista", aspRepo.findByEjAktiva());
+	        	break;		
 	        default:
 	        	if (_urval.startsWith("salu"))
 	        	{

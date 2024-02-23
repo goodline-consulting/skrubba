@@ -95,7 +95,9 @@
 	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='unpaid';document.getElementById('_action').value='urval';document.getElementById('urvalsform').submit()">Ej betalat</a></li>			          			
 	          			<li><hr class="dropdown-divider"></li>
 	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='aktiva';document.getElementById('_action').value='urval';document.getElementById('urvalsform').submit()">Aktiva</a></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='passiva';document.getElementById('_action').value='urval';document.getElementById('urvalsform').submit()">Passiva</a></li>
 	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='vilande';document.getElementById('_action').value='urval';document.getElementById('urvalsform').submit()">Vilande</a></li>
+	          			<li><a class="dropdown-item" href="#" onclick="document.getElementById('_urval').value='ejaktiva';document.getElementById('_action').value='urval';document.getElementById('urvalsform').submit()">Ej aktiva</a></li>
 	          			<li><hr class="dropdown-divider"></li>	          				          			
 	          			<li th:each="Tillsalu : ${visningar}">
 	          				<a class="dropdown-item" href="#" th:attr="onclick='updateTillsalu(\'' + ${Tillsalu.lottnr} + '\')'">Visning lott [[${Tillsalu.lottnr}]]</a>
@@ -195,9 +197,9 @@
 			<table class="table table-sm table-striped">
 				<thead><tr class="table-primary"><th scope="col" colspan="2">Följande symboler kan användas i brev till folk i kön</th></tr></thead>
 				 <tr><th scope="row">#AVINR</th><td>Ersätts med avinumret på senaste betalningsanmodan</td></tr>
-			     <tr><th scope="row">#KOPLATS</th><td>Ersätts med aspirantens köplats</td></tr> 	
+			     <tr><th scope="row">#KÖPLATS</th><td>Ersätts med aspirantens köplats</td></tr> 	
 				 <tr><th scope="row">#BG</th><td>Ersätts med Skrubbas bankgironummer</td></tr>
-				 <tr><th scope="row">#KOAVGIFT</th><td>Ersätts med aktuell köavgift</td></tr>
+				 <tr><th scope="row">#KÖAVGIFT</th><td>Ersätts med aktuell köavgift</td></tr>
 				 <tr><th scope="row">#BETALDATUM</th><td>Ersätts med datum köavgiften senast skall vara betald</td></tr>
 			</table>
 			<h4> </h4>
@@ -209,7 +211,7 @@
 			
 			<table class="table table-sm table-striped">
 				<thead><tr class="table-success"><th scope="col" colspan="2">Följande symboler kan användas i alla brev</th></tr></thead>
-				 <tr><th scope="row">#FORNAMN</th><td>Ersätts med personens förnamn</td></tr>
+				 <tr><th scope="row">#FÖRNAMN</th><td>Ersätts med personens förnamn</td></tr>
 			     <tr><th scope="row">#EFTERNAMN</th><td>Ersätts med personens efternamn</td></tr> 	
 				 <tr><th scope="row">#HELTNAMN</th><td>Ersätts med personens för och efternamn</td></tr>
 				 <tr><th scope="row">#EMAIL</th><td>Ersätts med personens emailadress</td></tr>

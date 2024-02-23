@@ -79,10 +79,11 @@ public class EkonomiController
 	
 	
 	@GetMapping("/ekonomi/fakturera")
-	public String faktureratalning (Model model) 
+	public String faktureraBetalning (Model model) 
 	{	
 		ekoService.fakturera();
 		model.addAttribute("datum", new Date());
+		model.addAttribute("message", "Betalpost skapas och mail skickas till alla i kön i bakgrunden. Kontroller status på processen under inställningar, Fakturaprocess");
 		return "/ekonomi.html";  		
 	}	
 	

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import se.goodline.skrubba.model.Aspirant;
@@ -26,6 +27,7 @@ import se.goodline.skrubba.repository.KoloniLottRepository;
 import se.goodline.skrubba.repository.UserRepository;
 
 @SpringBootApplication
+@EnableAsync
 public class SkrubbaApplication extends SpringBootServletInitializer  
 {
 
@@ -50,7 +52,13 @@ public class SkrubbaApplication extends SpringBootServletInitializer
 		if (userRepository.count() == 0)
         {
             userRepository.save(new User("admin", passwordEncoder.encode("alice00li"), true, "ROLE_ADMIN"));
-            userRepository.save(new User("kalle", passwordEncoder.encode("torpare"), true, "ROLE_USER"));
+            userRepository.save(new User("ingrid", passwordEncoder.encode("ingrid"), true, "ROLE_ADMIN"));
+            userRepository.save(new User("jimmie", passwordEncoder.encode("jimmie"), true, "ROLE_ADMIN"));
+            userRepository.save(new User("marit", passwordEncoder.encode("marit"), true, "ROLE_ADMIN"));
+            userRepository.save(new User("johnny", passwordEncoder.encode("johnny"), true, "ROLE_ADMIN"));
+            userRepository.save(new User("kerstin", passwordEncoder.encode("kerstin"), true, "ROLE_ADMIN"));
+            userRepository.save(new User("renee", passwordEncoder.encode("renee"), true, "ROLE_ADMIN"));
+            userRepository.save(new User("jeanette", passwordEncoder.encode("jeanette"), true, "ROLE_ADMIN"));
         }
 		
 		//loadAspirants();
@@ -63,13 +71,13 @@ public class SkrubbaApplication extends SpringBootServletInitializer
 		
 		System.out.println("*******laddar aspiranter********");
 		AspirantLoader aspLoader = new AspirantLoader();
-		aspLoader.loadAspirants("Dokument/intresselistan.csv");
+		aspLoader.loadAspirants("Dokument/intresselistan2024.csv");
 		ArrayList<Aspirant> aspList = aspLoader.getAsprianter();
 		for (Aspirant asp : aspList)
 		{
 			
 			Optional<User> user = userRepository.findByUserName(asp.getEmail());
-			if (!user.isEmpty())
+			if (user.isPresent())
 				continue;
 			userRepository.save(new User(asp.getEmail(), passwordEncoder.encode(asp.getEmail()), true, "ROLE_USER"));			
 			user = userRepository.findByUserName(asp.getEmail());

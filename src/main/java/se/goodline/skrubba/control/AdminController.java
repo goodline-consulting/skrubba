@@ -38,7 +38,24 @@ public class AdminController
 	@Autowired
 	AspirantRepository aspRepo;
 	
+	@GetMapping("/admin/change_password/{id}")
+	public String showPasswordForm(@PathVariable int id, Model model) 
+	{
+		model.addAttribute("id", id);
+		model.addAttribute("action", "/admin/change_password");
+    	return "/change_password";	
+	}
 	
+	@PostMapping("/admin/change_password")
+	public String changePasswordForm(HttpServletRequest request, Model model) 
+	{
+		    int id = Integer.parseInt(request.getParameter("id"));
+		    userService.updatePassword(id, request.getParameter("password"));
+		    
+		    model.addAttribute("admin", userService.getUser(id));
+		    
+	    	return "/index";	
+	}	
     /* 
 	@GetMapping("/aspirantlista")
 	public String aspirantLista(Model model) 

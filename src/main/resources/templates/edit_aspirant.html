@@ -12,8 +12,23 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   </head>
-  <body style='background-color:white'>
   
+  <body style='background-color:white'>
+		   <style>
+		    .custom-form-group {
+		        margin-bottom: 5px; /* Adjust the value as needed to reduce the spacing */
+		    }
+		   </style>
+		   <script>
+		   function validateAndSubmitForm() {
+			    var form = document.getElementById('aspform');
+			    //if (form.checkValidity()) {
+			        form.submit(); // If the form is valid, submit it
+			    //} else {
+			    //    form.classList.add('was-validated'); // Add Bootstrap's validation styles
+			    //}
+			}
+		   </script>
     <div class="container">
  		<img th:src="@{/images/skrubbalogga.jpg}" class="img-rounded" alt="Skrubbas Logga">   
       
@@ -26,10 +41,11 @@
 		    
 		  </ul>
 		  <ul class="nav navbar-nav ">
+		      <button type="submit" class="btn btn-link nav-link" form="aspform" ><span class="fa fa-floppy-o"></span> Spara</button>		  	  
 		  	  <li th:if = "${Role != null}" class="nav-item"><a class="nav-link" th:href="@{/aspirant/remove/{id}(id=${aspirant.id})}"><span class="fa fa-trash"></span> Radera</a></li>
 		  	  <li th:if = "${Role == null}" class="nav-item"><a class="nav-link" th:href="@{/aspirant/change_password/{id}(id=${aspirant.id})}"><span class="fa fa-user"></span> Byt lösenord</a></li>
 		      <li th:if = "${Role != null}" class="nav-item"><form id="fake2" th:action="@{/send_reset_link}" method="post"><input type="hidden" name="id" th:value="${aspirant.id}">
-		      		<a class="nav-link" href="#" onclick="document.getElementById('fake2').submit()"><span class="fa fa-user"></span> Skicka lösenord</a></form></li>
+		      		<a class="nav-link" href="#" onclick="document.getElementById('fake2').submit()"><span class="fa fa-user"></span> Skicka lord</a></form></li>
 		      
 		      <li th:if = "${Role == null}" class="nav-item"><a class="nav-link" th:href="@{/userpage/{id}(id=${aspirant.id})}"><span class="fa fa-sign-in"></span> Avbryt</a></li>
 		      <li th:if = "${Role != null}" class="nav-item"><a class="nav-link" th:href="@{/aspirantlista}"><span class="fa fa-sign-in"></span> Avbryt</a></li>
@@ -47,77 +63,94 @@
         </div>
     </div>	        
         <br>		
-		<div class = "container">
-			<div class = "row">
-			<!-- col-lg-6 col-md-6 col-sm-6 justify-content-center card -->
-				<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center card">
-					
-					<div class = "card-body">
-						<form class=class="form-inline" role="form" th:action="${ActionUrl}" th:object = "${aspirant}" method="POST">
-						<input hidden type="text" name = "Role" th:value="${Role}" />
-						<table>
-						<tr th:if = "${Role != null}"><td>Köstatus:</td>
-						<td><select th:field = "*{koStatus}" class="form-control" placeholder="Ange köstatus">
-    						<option value="Aktiv">Aktiv</option>
-    						<option value="Vilande">Vilande</option>
-  							</select></td>
-  						</tr>
-  						<tr th:if = "${Role != null}">
-  						<td>Köplats:</td>
-  						<td><input type = "text" name = "Köplats"	th:field = "*{koPlats}" class = "form-control" placeholder="Köplats"/></td>
-  						</tr>
-  						<tr th:if = "${Role != null}">
-  						<td>Inskriven:</td>
-  						<td><input type = "text" name = "inskriven"	th:field = "*{inskriven}" class = "form-control" placeholder="Inskriven Datum"/></td>
-  						</tr>
-  						<tr th:if = "${Role != null}">
-  						<td>Betalat:</td>
-  						<td><input type = "text" name = "betalat"	th:field = "*{betalat}" class = "form-control" placeholder="Betalat Datum"/></td>
-  						</tr>	
-						<tr ><td>Förnamn:</td>
-						<td><input type = "text" name = "fnamn"	th:field = "*{fnamn}" class = "form-control" placeholder="Ange förnamn"/></td>
-						</tr>
-						<tr><td>Efternamn:</td> 
-						<td><input type = "text" name = "enamn"	th:field = "*{enamn}" class = "form-control" placeholder="Ange efternamn"/></td>
-						</tr>
-						<tr><td>E-postadress:</td>
-					    <td width="300"><input type = "text" name = "email"	th:field = "*{email}" class = "form-control" placeholder="Ange E-postadress"/></td>
-						</tr>
-						<tr><td>Telefonnummer:&nbsp;</td>
-						<td><input type = "text" name = "telefon" th:field = "*{telefon}" class = "form-control" placeholder="Ange telefonnummer"/><td>
-						</tr>
-						<tr><td>Adress:</td>
-						<td><input type = "text" name = "adress" th:field = "*{adress}" class = "form-control" placeholder="Ange gatuadress"/></td>
-						</tr>
-						<tr><td>Postnummer:</td>
-						<td><input type = "text" name = "postnr" th:field = "*{postnr}"	class = "form-control" placeholder="Ange postnummer"/></td>
-						</tr>
-						<tr><td>Postadress:</td>
-						<td><input type = "text" name = "postAdress" th:field = "*{postAdress}" class = "form-control" placeholder="Ange postadress"/></td>
-						</tr><tr><td><br></td><td></td></tr>
-						<tr><td></td><td><button type="submit" class = "btn btn-primary">Spara</button></td></tr>	
-					    </table>
-						</form>					
-					</div>
+    <div class="container">
+     <div class="row justify-content-center">
+        <div class="col-md-6">
+
+			<form id="aspform" role="form" th:action="@{${ActionUrl == 'edit' ? '/aspirant/edit/' + aspirant.id : '/aspirant/new'}}" th:object = "${aspirant}" method="POST"> 
+			<input hidden type="text" name = "Role" th:value="${Role}" />
+			
+			<div th:if = "${Role != null}" class="form-group row custom-form-group">
+				<label for="koStatus" class="col-sm-3 col-form-label">Köstatus:</label>
+ 				<div class="col-sm-8">
+					<select th:field = "*{koStatus}" class="form-control" placeholder="Ange köstatus">
+ 						<option value="Aktiv">Aktiv</option>
+ 						<option value="Passiv">Passiv</option>
+ 						<option value="Vilande">Vilande</option>
+					</select>
+				</div>
+			</div>	
+			<div th:if = "${Role != null}" class="form-group row custom-form-group">
+				<label for="koPlats" class="col-sm-3 col-form-label">Köplats:</label>
+					<div class="col-sm-8">
+					<input type = "text" name = "Köplats"	th:field = "*{koPlats}" class = "form-control" placeholder="Köplats" required/>
+				</div>
+			</div>	
+			<div th:if = "${Role != null}" class="form-group row custom-form-group">
+				<label for="inskriven" class="col-sm-3 col-form-label">Inskriven:</label>
+				<div class="col-sm-8">
+					<input type = "date" name = "inskriven"	th:field = "*{inskriven}" class = "form-control" placeholder="Inskriven Datum" required/>					
+				</div>	
+			</div>
+			<div th:if = "${Role != null}" class="form-group row custom-form-group">
+				<label for="utbildad" class="col-sm-3 col-form-label">Utbildad:</label>
+				<div class="col-sm-8">
+					<input type = "date" name = "utbildad"	th:field = "*{utbildad}" class = "form-control" placeholder="Gått utbildning datum"/>
+				</div>
+			</div>	
+			<div th:if = "${Role != null}" class="form-group row custom-form-group">
+				<label for="betalat" class="col-sm-3 col-form-label">Betalat:</label>
+			    <div class="col-sm-8">	
+			    	<input type = "date" name = "betalat"	th:field = "*{betalat}" class = "form-control" placeholder="Betalat Datum"/>
+			    </div>
+			</div>	
+			<div class="form-group row custom-form-group">
+				<label for="fnamn" class="col-sm-3 col-form-label">Förnamn:</label>
+				<div class="col-sm-8">
+					<input type = "text" name = "fnamn"	th:field = "*{fnamn}" class = "form-control" placeholder="Ange förnamn" required/>					
 				</div>
 			</div>
+			<div class="form-group row custom-form-group">
+				<label for="enamn" class="col-sm-3 col-form-label">Efternamn:</label>							
+				<div class="col-sm-8">	
+					<input type = "text" name = "enamn"	th:field = "*{enamn}" class = "form-control" placeholder="Ange efternamn" required/>				
+				</div>
+			</div>
+			<div class="form-group row custom-form-group">
+				<label for="email" class="col-sm-3 col-form-label">Epostadress:</label>
+				<div class="col-sm-8">									
+		    		<input type = "email" name = "email" th:field = "*{email}" class = "form-control" placeholder="Ange E-postadress" required/>		    	
+		    	</div>
+		    	
+			</div>
+			<div class="form-group row custom-form-group">
+				<label for="telefon" class="col-sm-3 col-form-label">Telefonnummer:</label>
+				<div class="col-sm-8">	
+					<input type = "text" name = "telefon" th:field = "*{telefon}" class = "form-control" placeholder="Ange telefonnummer"/>
+				</div>
+			</div>
+			<div class="form-group row custom-form-group">
+				<label for="adress" class="col-sm-3 col-form-label">Adress:</label>
+				<div class="col-sm-8">	
+					<input type = "text" name = "adress" th:field = "*{adress}" class = "form-control" placeholder="Ange gatuadress"/>
+				</div>
+			</div>
+			<div class="form-group row custom-form-group">
+			 	<label for="postnr" class="col-sm-3 col-form-label">Postnummer:</label>
+				<div class="col-sm-8">	
+					<input type = "text" name = "postnr" th:field = "*{postnr}"	class = "form-control" placeholder="Ange postnummer"/>
+				</div>
+			</div>
+			<div class="form-group row custom-form-group">
+				<label for="postAdress" class="col-sm-3 col-form-label">Postadress:</label>
+				<div class="col-sm-8">	
+					<input type = "text" name = "postAdress" th:field = "*{postAdress}" class = "form-control" placeholder="Ange postadress"/>
+			    </div>
+			</div>					
+		</form>		
 		</div>
-		
-		<!-- 
-		<div class="container" align="center"> 
-		<form action="#" th:action="@{/saveAspirant}" th:object="${aspirant}" method="POST">
-			<input type="text" th:field="*{fnamn}"
-				placeholder="Förnamn" class="form-control mb-4 col-4">
-				
-				<input type="text" th:field="*{enamn}"
-				placeholder="Efternamn" class="form-control mb-4 col-4">
-				
-				<input type="text" th:field="*{email}"
-				placeholder="Email" class="form-control mb-4 col-4">
-				
-				<button type="submit" class="btn btn-info col-2"> Spara </button>
-		</form>  
-		 -->             
+		</div>	
+					
 	</div>
 </body></html>
 

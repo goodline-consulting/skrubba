@@ -17,7 +17,81 @@
             box-sizing: border-box;
         }
     </style>
-    <script th:inline="javascript">
+   
+</head>
+<body>
+<div class="container pt-md-2">
+<img th:src="@{/images/skrubbalogga.jpg}" class="img-rounded" alt="Skrubbas Logga">
+
+<nav class="navbar navbar-expand-sm navbar-light bg-light">
+  <ul class="navbar-nav mr-auto">
+  	<li class="nav-item active">
+      	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
+    </li>
+     <li class="nav-item active"><a class="navbar-text" th:text="${'   Betalningar gjorda av  ' + aspnamn}"></a></li>
+  </ul>  
+  <ul class="navbar-nav mr-auto">
+  	   
+      <li class="nav-item active"><a id="regsave" class="nav-link" href="javascript:showAddPaymentForm()"><span class="fa fa-credit-card"></span> Registrera betalning</a></li>
+      <li class="nav-item active"><a class="nav-link" th:href="@{/aspirantlista}"><span class="fa fa-sign-in"></span> Tillbaka</a></li>
+   
+  </ul> 
+</nav>
+</div>
+<br>
+ <div id="deleteButton" th:attr="data-delete-url=@{/betalning/delete/}"></div>
+<div class = "container">
+	<div class = "row">
+		<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center card">
+		<div th:if = "${message != null}" class="alert alert-danger alert-dismissible col-md-12 fade show"  role="alert">
+        		[[${message}]]
+        		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    				<span aria-hidden="true">&times;</span>
+  				</button> 
+        </div>
+        </div>
+   </div>    
+  
+   <div class = "row"> 
+		<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center card">		
+			<div class = "card-body"> 
+		    <table class="table table-striped table-bordered">
+		        <thead>
+		            <tr>
+		                <th>År</th>
+		                <th>Betaldatum</th>
+		                <th>Summa</th>
+		                <th>Avinr</th>
+		            </tr>
+		        </thead>
+		        <tbody>
+		            <tr th:data-id="${betalning.id}" th:each="betalning : ${betallista}">
+		                <td th:text="${betalning.ar}"></td>
+		                <td th:text="${#dates.format(betalning.betdatum, 'yyyy-MM-dd')}"></td>
+		                <td th:text="${betalning.summa + ':-'}"></td>
+		                <td th:text="${betalning.id}"></td>
+		                <td width="5%"><span class="fa fa-trash-o" aria-hidden="true" onclick="removeRow(this)"></span></td>
+		            </tr>
+		            <tr data-id="0" id="addPaymentRow" style="display: none;">
+		            <form  id="addPaymentForm" th:action="@{/betalning/ny}" th:object="${ny_betalning}" method="post" style="display: none;">
+    					<input type= "hidden" id="asp" th:field="*{asp}"/>
+        				<td><input type="text" class="form-control" id="ar" th:field="*{ar}" required></td>
+        				<td><input type="text" class="form-control" id="betdatum" th:field="*{betdatum}" required></td>
+        				<td th:text="*{summa + ':-'}"></td>
+        				<td></td>                        
+                        <td width="5%"><span class="fa fa-trash-o" aria-hidden="true" onclick="removeRow(this)"></span></td>   
+                        <input type="hidden" id="summa" name="summa" th:value="${ny_betalning.summa}"> 
+    				</form>
+		            </tr>
+		        </tbody>
+		    </table>
+		    <!-- Form for adding a new payment -->
+    
+		    
+ 		</div>
+ 	</div>
+ </div>
+  <script th:inline="javascript">
         function showAddPaymentForm() {
         	var form = document.getElementById('addPaymentForm');
             if (form.style.display == 'table-row')
@@ -56,9 +130,9 @@
                 // Example: Assuming there is a data-id attribute on the row
                 id: row.getAttribute('data-id'),
             };
-
-            // Make an AJAX call to delete the corresponding database row
-            fetch('/betalning/delete/' + row.getAttribute('data-id'), {
+            var deleteButton = document.getElementById('deleteButton');
+            var deleteUrl = deleteButton.getAttribute('data-delete-url');
+ 				fetch(deleteUrl + row.getAttribute('data-id'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,78 +154,7 @@
                 console.error('Error during removal:', error);
             });
         }
-    </script>
-</head>
-<body>
-<div class="container pt-md-2">
-<img th:src="@{/images/skrubbalogga.jpg}" class="img-rounded" alt="Skrubbas Logga">
-
-<nav class="navbar navbar-expand-sm navbar-light bg-light">
-  <ul class="navbar-nav mr-auto">
-  	<li class="nav-item active">
-      	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
-    </li>
-     <li class="nav-item active"><a class="navbar-text" th:text="${'   Betalningar gjorda av  ' + aspnamn}"></a></li>
-  </ul>  
-  <ul class="navbar-nav mr-auto">
-  	   
-      <li class="nav-item active"><a id="regsave" class="nav-link" href="javascript:showAddPaymentForm()"><span class="fa fa-credit-card"></span> Registrera betalning</a></li>
-      <li class="nav-item active"><a class="nav-link" href="/aspirantlista"><span class="fa fa-sign-in"></span> Tillbaka</a></li>
-   
-  </ul> 
-</nav>
-</div>
-<br>
-<div class = "container">
-	<div class = "row">
-		<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center card">
-		<div th:if = "${message != null}" class="alert alert-danger alert-dismissible col-md-12 fade show"  role="alert">
-        		[[${message}]]
-        		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    				<span aria-hidden="true">&times;</span>
-  				</button> 
-        </div>
-        </div>
-   </div>    
-   <div class = "row"> 
-		<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center card">		
-			<div class = "card-body"> 
-		    <table class="table table-striped table-bordered">
-		        <thead>
-		            <tr>
-		                <th>År</th>
-		                <th>Betaldatum</th>
-		                <th>Summa</th>
-		                <th>Avinr</th>
-		            </tr>
-		        </thead>
-		        <tbody>
-		            <tr th:data-id="${betalning.id}" th:each="betalning : ${betallista}">
-		                <td th:text="${betalning.ar}"></td>
-		                <td th:text="${#dates.format(betalning.betdatum, 'yyyy-MM-dd')}"></td>
-		                <td th:text="${betalning.summa + ':-'}"></td>
-		                <td th:text="${betalning.id}"></td>
-		                <td width="5%"><span class="fa fa-trash-o" aria-hidden="true" onclick="removeRow(this)"></span></td>
-		            </tr>
-		            <tr data-id="0" id="addPaymentRow" style="display: none;">
-		            <form  id="addPaymentForm" th:action="@{/betalning/ny}" th:object="${ny_betalning}" method="post" style="display: none;">
-    					<input type= "hidden" id="asp" th:field="*{asp}"/>
-        				<td><input type="text" class="form-control" id="ar" th:field="*{ar}" required></td>
-        				<td><input type="text" class="form-control" id="betdatum" th:field="*{betdatum}" required></td>
-        				<td th:text="*{summa + ':-'}"></td>
-        				<td></td>                        
-                        <td width="5%"><span class="fa fa-trash-o" aria-hidden="true" onclick="removeRow(this)"></span></td>        
-    				</form>
-		            </tr>
-		        </tbody>
-		    </table>
-		    <!-- Form for adding a new payment -->
-    
-		    
- 		</div>
- 	</div>
- </div>
-    
+    </script>   
     
 </body>
 </html>

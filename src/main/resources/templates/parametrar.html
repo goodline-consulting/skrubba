@@ -56,8 +56,10 @@
             };
             const formData = new FormData();
             formData.append('id', row.getAttribute('data-id'));
+            var deleteButton = document.getElementById('deleteButton');
+            var deleteUrl    = deleteButton.getAttribute('data-delete-url');
             // Make an AJAX call to delete the corresponding database row
-            fetch('/param/delete/' + row.getAttribute('data-id'), {
+            fetch(deleteUrl + row.getAttribute('data-id'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -99,6 +101,7 @@
 </nav>
 </div>
 <br>
+<div id="deleteButton" th:attr="data-delete-url=@{/param/delete/}"></div>
 <div class = "container">
 	<div class = "row">
 		<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center card">		

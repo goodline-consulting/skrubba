@@ -10,23 +10,24 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class Aspirant 
 {
     @Id
-    private int id;
-    private String fnamn;
-    private String enamn;
-    private String adress;
-    private String postnr;
-    private String postAdress;
-    private String telefon;
-    private String email;  
+    private int     id;
+    private String  fnamn;
+    private String  enamn;
+    private String  adress;
+    private String  postnr;
+    private String  postAdress;
+    private String  telefon;
+    private String  email;  
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-	private Date   inskriven;
+	private Date    inskriven;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date   betalat;
-    private int	   koPlats;
-    private int    koPlatsAktiv;
-    private int	   visningar;
-    
-	private String koStatus;
+    private Date    betalat;
+    private int	    koPlats;
+    private int     koPlatsAktiv;
+    private int	    visningar;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date    utbildad;
+	private String  koStatus;
     
     public int getId() {
         return id;
@@ -140,12 +141,21 @@ public class Aspirant
 		this.visningar = visningar;
 	}
 
+	
+	public Date getUtbildad() {
+		return utbildad;
+	}
+
+	public void setUtbildad(Date utbildad) {
+		this.utbildad = utbildad;
+	}
+
 	@Override
 	public String toString() {
 		return "Aspirant [id=" + id + ", fnamn=" + fnamn + ", enamn=" + enamn + ", adress=" + adress + ", postnr="
 				+ postnr + ", postAdress=" + postAdress + ", telefon=" + telefon + ", email=" + email + ", inskriven="
 				+ inskriven + ", betalat=" + betalat + ", koPlats=" + koPlats + ", koPlatsAktiv=" + koPlatsAktiv + ", koStatus="  
-				+ koStatus + ", visningar=" + visningar +"]";
+				+ koStatus + ", visningar=" + visningar + ", utbildad=" + utbildad + "]";
 	}
 
 	public Aspirant() {
@@ -154,7 +164,7 @@ public class Aspirant
 		this.visningar = 0;
 	}
 
-	public Aspirant(int id, String fnamn, String enamn, String adress, String postnr, String postAdress, Date inskriven, Date betalat, int koPlats, int koPlatsAktiv, String koStatus) 
+	public Aspirant(int id, String fnamn, String enamn, String adress, String postnr, String postAdress, Date inskriven, Date betalat, int koPlats, int koPlatsAktiv, String koStatus, Date utbildad) 
 	{
 		super();
 		this.id           = id;
@@ -169,6 +179,7 @@ public class Aspirant
 		this.koPlatsAktiv = koPlats;
 		this.koStatus     = koStatus;
 		this.visningar    = 0;
+		this.utbildad     = utbildad;
 	}
    
 }
