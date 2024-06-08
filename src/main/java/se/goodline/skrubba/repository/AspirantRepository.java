@@ -25,7 +25,7 @@ public interface AspirantRepository extends JpaRepository<Aspirant, Integer> {
     @Query(value = "SELECT * FROM aspirant p where ko_status = 'Aktiv' order by ko_plats", nativeQuery=true)
     public List<Aspirant> findByActive();
     
-    @Query(value = "SELECT * FROM aspirant p where ko_status = 'Passive' order by ko_plats", nativeQuery=true)
+    @Query(value = "SELECT * FROM aspirant p where ko_status = 'Passiv' order by ko_plats", nativeQuery=true)
     public List<Aspirant> findByPassive();
     
     @Query(value = "SELECT * FROM aspirant p where ko_status = 'Vilande' order by ko_plats", nativeQuery=true)
@@ -33,8 +33,17 @@ public interface AspirantRepository extends JpaRepository<Aspirant, Integer> {
     
     @Query(value = "SELECT * FROM aspirant p where ko_status != 'Aktiv' order by ko_plats", nativeQuery=true)
     public List<Aspirant> findByEjAktiva();
-
     
     @Query(value = "SELECT * FROM aspirant JOIN visning ON aspirant.id = visning.asp JOIN tillsalu  ON visning.id = tillsalu.id and tillsalu.saljdatum is null WHERE tillsalu.lottnr = ?1 order by ko_plats", nativeQuery=true)
     public List<Aspirant> findByInvitedToSail(int lottnr);
+    
+    @Query(value = "SELECT COUNT(a.id) FROM aspirant a WHERE a.ko_status = ?1", nativeQuery=true)
+    int getAmountWithStatus(String atatus);
+    
+    @Query(value = "SELECT COUNT(a.id) FROM aspirant a WHERE a.betalat is not null", nativeQuery=true)
+    int getAmountPaid();
+    
+    @Query(value = "SELECT COUNT(a.id) FROM aspirant a WHERE a.betalat is null", nativeQuery=true)
+    int getAmountNotPaid();
+    
 }

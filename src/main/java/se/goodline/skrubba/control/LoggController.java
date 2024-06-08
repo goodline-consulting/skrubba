@@ -3,6 +3,8 @@ package se.goodline.skrubba.control;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,6 +15,7 @@ import org.aspectj.weaver.loadtime.Options;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import net.bytebuddy.utility.RandomString;
 import se.goodline.skrubba.model.Aspirant;
 import se.goodline.skrubba.model.Kolonilott;
+import se.goodline.skrubba.model.Logg;
 import se.goodline.skrubba.model.Tillsalu;
 import se.goodline.skrubba.model.Urval;
 import se.goodline.skrubba.model.User;
@@ -38,68 +42,50 @@ import se.goodline.skrubba.repository.UserRepository;
 import se.goodline.skrubba.repository.VisningRepository;
 import se.goodline.skrubba.service.AspirantService;
 import se.goodline.skrubba.service.EmailService;
+import se.goodline.skrubba.service.LoggService;
 import se.goodline.skrubba.service.SkrubbaUserDetailsService;
 
 @Controller
-public class VisningsController 
+public class LoggController 
 {
 	
-	@Autowired
-	private VisningRepository visRepo;
 	
 	@Autowired
-	private EmailService emailService;
-	
-	@Autowired
-	AspirantRepository aspRepo;
-	
-	@Autowired
-	TillSaluRepository saluRepo;
-	
-	
-	
-	@GetMapping("/visning/valj/{id}/{lottnr}")
-	public String editVisningUrval(@PathVariable int id, @PathVariable int lottnr, Model model) 
+	LoggService loggService;
+		
+	@GetMapping("/logg")
+	public String loggUrval(Model model) 
 	{
-		List<String> aspList = new ArrayList<String>();
-		List<Aspirant> aspirantLista = new ArrayList<Aspirant>();
-		
-		Urval urval = new Urval();
-		
-		Tillsalu salu = saluRepo.getById(id);
-		for (Visning visning : visRepo.findBySaluId(id))
-		{	
-			aspList.add("" + visning.getAsp());
-			aspirantLista.add(aspRepo.getById(visning.getAsp()));
-		}	
-		urval.setValda(aspList);	
-		model.addAttribute("lott", salu.getLottnr());
-		model.addAttribute("datum", salu.getVisdatum());
-		model.addAttribute("sald", salu.getSaljdatum());
-		model.addAttribute("lottnr", lottnr);	
-		model.addAttribute("urval", urval);
-		model.addAttribute("						ali", "/visning/save/" + id);
-		model.addAttribute("tillbakaUrl", "/tillsalulista/" + lottnr);
-		if (salu.getSaljdatum() == null)
-			model.addAttribute("aspirantlista", aspRepo.findByActive());
-		else
-			model.addAttribute("aspirantlista", aspirantLista);
-	  	return "/visning_valj.html";      
+		List<Logg> logg = loggService.getAll();		
+		model.addAttribute("logg", logg);
+	  	return "/logg.html";      
 	}  
 	
-	@PostMapping("/visning/save/{id}")
-	public String saveVisning(@PathVariable int id, Urval valda, @Param("lottnr") int lottnr, Model model) 
+	@PostMapping("/logg/filter")
+	public String filterLogg(@RequestParam("user") String userName, @RequestParam(value = "dFrom", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date dFrom, @RequestParam(value = "dTo", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date dTo, Model model) 
 	{		
-		visRepo.deleteBySaluId(id);
-		
-		for (String vald: valda.getValda())
-		{
-			//System.out.println(visa.toString());
-			visRepo.save(new Visning(id, Integer.parseInt(vald)));
-		};
-		
-		return "redirect:/tillsalulista/" + lottnr;		
-	}
+		List<Logg> logg = null;
+		System.out.println("user: " + userName + " dFrom: " + (dFrom == null? "null": dFrom) + " dTo: " + (dTo == null? "null" : dTo));
+		if (dTo == null && dFrom != null)
+		{				
+			Calendar calendar = Calendar.getInstance();
+	        calendar.setTime(dFrom);	        
+	        calendar.set(Calendar.HOUR_OF_DAY, 23);
+	        calendar.set(Calendar.MINUTE, 59);
+	        calendar.set(Calendar.SECOND, 59);
+	        calendar.set(Calendar.MILLISECOND, 999);	
+	        dTo = calendar.getTime();
+		}	
+		if (userName.equals("") && dFrom == null)
+			 logg = loggService.getAll();
+		else if (!userName.equals("") && dFrom == null)
+			logg = loggService.getByUser("%" + userName + "%");
+		else if (dFrom != null && userName.equals(""))
+			logg = loggService.getByDates(dFrom, dTo);
+		else
+			logg = loggService.getByAll(userName, dFrom, dTo);
+		model.addAttribute("logg", logg);
+	  	return "/logg.html";	}
 	
 	     
 }

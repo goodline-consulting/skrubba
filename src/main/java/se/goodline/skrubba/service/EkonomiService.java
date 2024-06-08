@@ -92,6 +92,7 @@ public class EkonomiService
 					antBet++;
 					createBetalning(asp.getId(), Year.now().getValue());
 					bet = betRepo.findThisYear(asp.getId(), Year.now().getValue());	
+					asp.setBetalat(null);
 				}	
 				if (bet.get().getMailat() == null)
 				{

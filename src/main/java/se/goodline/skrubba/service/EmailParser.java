@@ -14,6 +14,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -118,22 +119,19 @@ public class EmailParser
 		//return new EmailForm(newSubject, newBody, newFooter, em.getAttachments());
 		return em;
 	}
+	
 	EmailForm parseLottEmailForm(EmailForm em, Kolonilott lott)
 	{
-		String newSubject = null;
-		String newBody    = null;
-		String newFooter  = null;
-		
 		if (em.getSubject() != null)
 			em.setSubject(replaceTokens(em.getSubject(), lott));
-			//newSubject = replaceTokens(em.getSubject(), lott);
+		
 		if (em.getBody() != null)
 			em.setBody(replaceTokens(em.getBody(), lott));
-			//newBody    = replaceTokens(em.getBody(), lott);
+		
 		if (em.getFooter() != null)
 			em.setFooter(replaceTokens(em.getFooter(), lott));
-			//newFooter  = replaceTokens(em.getFooter(), lott);
 		
-		return new EmailForm(newSubject, newBody, newFooter, em.getAttachments());
+		return em;
+		
 	}
 }

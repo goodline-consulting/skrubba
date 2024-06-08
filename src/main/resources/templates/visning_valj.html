@@ -32,14 +32,14 @@
   </ul>
   <ul class="nav navbar-nav ">
       
-      <li class="nav-item"><a class="nav-link" th:href="${tillbakaUrl}"><span class="fa fa-sign-in"></span> Tillbaka</a></li>
+      <li class="nav-item"><a class="nav-link" th:href="@{${tillbakaUrl}}"><span class="fa fa-sign-in"></span> Tillbaka</a></li>
     </ul> 
 </nav>
 </div>
 <div th:if = "${sald == null}" class="container">
 	<div class="row">
         <div class="col-md-8 mt-5">
-			<form th:action="${actionUrl}" th:object="${urval}" method="post">
+			<form th:action="@{${actionUrl}}" th:object="${urval}" method="post">
 				<input type="hidden" name = "lottnr" th:value="${lottnr}" />
 			    <select th:field="*{valda}" multiple="multiple" id="dualListbox" size="20" class="form-select" aria-label="size 3 select example">
 			        <!-- Add your items here -->

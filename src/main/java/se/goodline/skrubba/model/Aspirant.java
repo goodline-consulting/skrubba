@@ -181,5 +181,22 @@ public class Aspirant
 		this.visningar    = 0;
 		this.utbildad     = utbildad;
 	}
-   
+    
+	public Aspirant(Anmalan anm)
+	{
+		super();
+		this.fnamn        = anm.getFnamn();
+		this.enamn        = anm.getEnamn();
+		this.adress       = anm.getAdress();
+		this.postnr       = anm.getPostnr();
+		this.postAdress   = anm.getPadress();
+		this.email        = anm.getEmail();
+		this.inskriven    = new Date();
+		//this.betalat      = betalat;
+		//this.koPlats      = koPlats;
+		//this.koPlatsAktiv = koPlats;
+		this.koStatus     = "Vilande";
+		this.visningar    = 0;
+		this.utbildad     = null;
+	}
 }

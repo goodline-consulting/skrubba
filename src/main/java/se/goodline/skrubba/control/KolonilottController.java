@@ -76,7 +76,7 @@ public class KolonilottController
 	public String showKoloniForm(@PathVariable int lottnr, Model model) 
 	{		
 		model.addAttribute("lott", lottRepo.getById(lottnr));	
-		model.addAttribute("ActionUrl", "/kolonilott/edit/");
+		//model.addAttribute("ActionUrl", "/kolonilott/edit/");
 		Optional<Tillsalu> salu = saluRepo.findPagaende(lottnr);
 		
 		if (salu.isPresent())

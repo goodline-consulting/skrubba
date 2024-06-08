@@ -140,7 +140,15 @@
     <div class="loading-container" id="loadingContainer">
     	<div class="loading-spinner"></div>
    		<p>Sending mail...</p>
-     </div>
+    </div>
+    <div> 
+      	<div th:if = "${message != null}" class="alert alert-success alert-dismissible fade show"  role="alert">
+      		[[${message}]]
+      		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+  				<span aria-hidden="true">&times;</span>
+				</button> 
+      	</div>
+    </div>   
     <div class="row g-3">
 	        <div class="col-sm-8 mb-2">
     			<input type="text"  class="form-control" id="subject" name="subject" th:field="*{subject}" required placeholder="Mailets rubrik"/>

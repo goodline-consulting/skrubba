@@ -47,7 +47,7 @@
 				<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center card">
 					
 					<div class = "card-body">
-						<form class=class="form-inline" role="form" th:action="${ActionUrl}" th:object = "${tillsalu}" method="POST">						
+						<form class=class="form-inline" role="form" th:action="@{/tillsalu/save}" th:object = "${tillsalu}" method="POST">						
 						<table>
 						<input type="hidden" name = "id" th:value="*{id}" />
 						<input type="hidden" name = "sparurl" id = "sparurl" th:value="${tillbaka}" />
@@ -56,7 +56,7 @@
   						</tr>
   						<tr>
   						<td>Visas:</td>
-  						<td><input type = "text" name = "visdatum"	th:field = "*{visdatum}"  class = "form-control" placeholder="ange visningsdatum"/></td>
+  						<td><input type = "date" name = "visdatum"	th:field = "*{visdatum}"  class = "form-control" placeholder="ange visningsdatum"/></td>
   						</tr>
   						<tr>
   						<td>Såld:</td>

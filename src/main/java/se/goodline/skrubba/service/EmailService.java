@@ -1,29 +1,26 @@
 package se.goodline.skrubba.service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.InputStreamSource;
 import org.springframework.core.io.Resource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import se.goodline.skrubba.model.Aspirant;
 import se.goodline.skrubba.model.EmailForm;
 import se.goodline.skrubba.model.Kolonilott;
+import se.goodline.skrubba.repository.AspirantRepository;
+import se.goodline.skrubba.repository.KoloniLottRepository;
 import se.goodline.skrubba.repository.ParamRepository;
 
 @Service
@@ -37,6 +34,15 @@ public class EmailService
 	
 	@Autowired
 	ParamRepository paramRepo;
+	
+	@Autowired
+	KoloniLottRepository lottRepo;
+	
+	@Autowired
+	AspirantRepository aspRepo;
+	
+	@Autowired
+	LoggService loggService;
 	
 	public void sendPasswordLink(String recipientEmail, String link) throws MessagingException, UnsupportedEncodingException
     {
@@ -89,7 +95,7 @@ public class EmailService
 	public void sendEmail(String recipientEmail, EmailForm em) throws MessagingException, IOException
 	{
 		String folder = null;
-		if (recipientEmail.contains("noemail.se"))
+		if (recipientEmail.contains("noemail.se") || recipientEmail.startsWith("bytutmej"))
 		{	
 			System.out.println("Saknar riktig emailadress:" + recipientEmail);
 			return;			
@@ -119,26 +125,55 @@ public class EmailService
         mailSender.send(message);
 	}
 	
+	@Async
+	@Transactional
+	public void sendToAspList(List<String> valda, EmailForm em) throws  Exception
+	{
+		//String mailMottagare = paramRepo.findByParamName("Mailmottagare").isPresent() ? paramRepo.findByParamName("Mailmottagare").get().getParamValue() : null;
+		int tot   = 0;
+		int antal = 0;
+		for (String vald: valda)
+		{		
+			Aspirant asp = aspRepo.findById(Integer.parseInt(vald));
+			antal++;
+			tot++;
+			if (antal > 19)
+			{				
+				System.out.println("Skickat " + tot + " mail, Pausar fem minuter.");
+				loggService.add("MAIL", "Skickat " + tot + " mail, Pausar fem minuter.");
+				Thread.sleep(5 * 60 * 1000);
+				antal = 0;			
+			}
+			EmailForm emCopy = em.clone();
+			emCopy = emp.parseAspEmailForm(emCopy, asp);
+			sendEmail(asp.getEmail(), emCopy);	
+		}
+		loggService.add("MAIL", "Email med rubrik " + em.getSubject() + " skickat till " + tot + " i kön");
+	}	
 	
-	public void sendToAspList(List<Aspirant> aspList, EmailForm em) throws  Exception
+	@Async
+	@Transactional
+	public void sendToLottList(List<String> valda, EmailForm em) throws  Exception
 	{
-		//String mailMottagare = paramRepo.findByParamName("Mailmottagare").isPresent() ? paramRepo.findByParamName("Mailmottagare").get().getParamValue() : null;
-		for (Aspirant asp : aspList)
+		int antal = 0;
+		int tot   = 0;
+		for (String vald : valda)	
 		{
-			EmailForm emNy = emp.parseAspEmailForm(em, asp);
-			emNy.setBilageLista(em.getBilageLista());
-			sendEmail(asp.getEmail(), emNy);			
+			Kolonilott lott = lottRepo.getById(Integer.parseInt(vald));
+			
+			antal++;
+			if (antal > 19)
+			{				
+				System.out.println("Skickat " + tot + " mail, Pausar fem minuter.");
+				loggService.add("MAIL", "Skickat " + tot + " mail, Pausar fem minuter.");						
+				Thread.sleep(5 * 60 * 1000);
+				antal = 0;			
+			}
+			EmailForm emCopy = em.clone();
+			emCopy = emp.parseLottEmailForm(emCopy, lott);
+			sendEmail(lott.getEmail(), emCopy);	
 		}
-	}
-	public void sendToLottList(List<Kolonilott> lottList, EmailForm em) throws  Exception
-	{
-		//String mailMottagare = paramRepo.findByParamName("Mailmottagare").isPresent() ? paramRepo.findByParamName("Mailmottagare").get().getParamValue() : null;
-		for (Kolonilott lott : lottList)
-		{
-			EmailForm emNy = emp.parseLottEmailForm(em, lott);
-			emNy.setBilageLista(em.getBilageLista());
-			sendEmail(lott.getEmail(), emNy);
-		}
+		loggService.add("MAIL", "Email med rubrik " + em.getSubject() + " skickat till " + tot + " kolonister");
 	}
 	
 	public void sendBetalningsBekraftelse(EmailForm em, Aspirant asp) throws  Exception
@@ -146,13 +181,6 @@ public class EmailService
 		EmailForm emNy = emp.parseAspEmailForm(em, asp);
 		emNy.setBilageLista(em.getBilageLista());
 		sendEmail(asp.getEmail(), emNy);
-	}
-	
-	
-	
-	
-	
-	
-	
-		
+		loggService.add("BEKR", "Skickar betalningsbekrätelse till " + asp.getEmail());
+	}		
 }

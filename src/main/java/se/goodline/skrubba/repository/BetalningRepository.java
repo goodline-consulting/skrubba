@@ -24,6 +24,9 @@ public interface BetalningRepository extends JpaRepository<Betalning, Integer>
     @Query(value = "SELECT * from betalning v where v.asp = ?1 and ar = ?2", nativeQuery = true)
     public Optional<Betalning> findThisYear(int aspId, int year); 
     
+    @Query(value = "SELECT * FROM betalning WHERE asp = ?1 ORDER BY ar DESC LIMIT 1", nativeQuery = true)
+    public Betalning findLastBet(int aspId);
+    
     @Transactional
     @Modifying
     @Query(value = "DELETE from betalning v where v.asp = ?1", nativeQuery = true)

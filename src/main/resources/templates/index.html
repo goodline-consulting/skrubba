@@ -19,15 +19,17 @@
 
 <nav class="navbar navbar-expand-sm navbar-light bg-light">
   <ul class="navbar-nav mr-auto">
-  	<li class="nav-item active">
-      	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
-    </li>  
-    <li class="nav-item dropdown">
+   <li class="nav-item">
+      <a class="nav-link" title="Klicka för att byta lösenord" th:href="@{/admin/change_password/{id}(id=${admin.id})}"><span class="fa fa-home"></span>[[${admin.userName}]]</a>
+   </li>
+   
+    
+   <li class="nav-item dropdown">
    		<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false"><span class="fa fa-cog"></span>Underhåll</a>
   		<ul class="dropdown-menu">
+  			<li><a class="dropdown-item" th:href="@{/mail/mallar}">Mallar</a></li>  
   			<li><a class="dropdown-item" th:href="@{/params}">Inställningar</a></li>
-  			<li><a class="dropdown-item" th:href="@{/logg}">Logg</a></li>	
-  			<li><a class="dropdown-item" th:href="@{/admin/change_password/{id}(id=${admin.id})}">Byt lösenord</a></li>    			        			
+  			<li><a class="dropdown-item" th:href="@{/logg}">Logg</a></li>	  			  			        			
   		</ul>
 	</li>    
     <li class="nav-item">
@@ -46,7 +48,7 @@
       <a class="nav-link" th:href="@{/mail/}"><span class="fa fa-envelope-o"></span>Mail</a>
     </li>
      <li class="nav-item">
-      <a class="nav-link" th:href="@{/mail/mallar}"><span class="fa fa-file-o"></span>Mallar</a>
+      <a class="nav-link" th:href="@{/anmalningar}"><span class="fa fa-file-o"></span>Anmälningar</a>
     </li>
   </ul>
   <ul class="nav navbar-nav ">

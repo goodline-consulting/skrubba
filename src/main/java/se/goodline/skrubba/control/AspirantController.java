@@ -29,6 +29,7 @@ import se.goodline.skrubba.model.Aspirant;
 import se.goodline.skrubba.model.Tillsalu;
 import se.goodline.skrubba.model.User;
 import se.goodline.skrubba.model.Visning;
+import se.goodline.skrubba.model.userExistsException;
 import se.goodline.skrubba.repository.AspirantRepository;
 import se.goodline.skrubba.repository.TillSaluRepository;
 import se.goodline.skrubba.repository.UserRepository;
@@ -100,25 +101,9 @@ public class AspirantController
 	@PostMapping("/aspirant/new")
 	public String newAspirant(HttpServletRequest request, @ModelAttribute("aspirant") Aspirant aspirant, Model model) 
 	{		
-		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		// if (aspirantService.aspirantExists(aspirant.getEmail()))
-		if (userService.userExists(aspirant.getEmail()))
-		{
-			model.addAttribute("message", "Det finns redan en person med email adress" + aspirant.getEmail() + "!");
-			model.addAttribute("aspirant", aspirant);
-			model.addAttribute("Role", "ROLE_ADMIN");
-			model.addAttribute("ActionUrl", "new");	
-			return "/edit_aspirant.html"; 
-		}
-		//EmailService emailService = new EmailService();
-		String token = RandomString.make(30); 	    	
-		userRepo.save(new User(aspirant.getEmail(), passwordEncoder.encode(aspirant.getEmail()), true, "ROLE_USER"));
-		
-    	try 
-    	{
-            userService.updateResetPasswordToken(token, aspirant.getEmail());
-            String resetPasswordLink = getSiteURL(request) + "/reset_password?token=" + token;
-            emailService.sendWelcomeLink(aspirant.getEmail(), resetPasswordLink);                        
+		try 
+    	{   
+    		aspirantService.newAspirant(aspirant);                     
         } 
     	catch (UsernameNotFoundException ex) 
     	{
@@ -135,9 +120,15 @@ public class AspirantController
 			model.addAttribute("Role", "ROLE_ADMIN");
 			model.addAttribute("ActionUrl", "new");	
 			return "/edit_aspirant.html"; 
-        }
-        
-        aspirantService.newAspirant(aspirant);
+        } 
+    	catch (userExistsException e) 
+    	{
+    		model.addAttribute("message", "Det finns redan en person med email adress" + aspirant.getEmail() + "!");
+			model.addAttribute("aspirant", aspirant);
+			model.addAttribute("Role", "ROLE_ADMIN");
+			model.addAttribute("ActionUrl", "new");	
+			return "/edit_aspirant.html"; 
+		}               
 		return "redirect:/aspirantlista";      
 	}  
 	
@@ -179,12 +170,12 @@ public class AspirantController
 		oldAspirant.setTelefon(aspirant.getTelefon());
 		
 		aspirantService.saveAspirant(oldAspirant);
-		System.out.print(oldStatus + " / " + aspirant.getKoStatus());
+		//System.out.print(oldStatus + " / " + aspirant.getKoStatus());
 		// vi kollar om statusen är ändrad. I så fall skall vi räkna om köplatsen koPlatsAktiv
 		if (oldStatus != oldAspirant.getKoStatus())
 		{
 			List<Aspirant> aspLista = aspirantService.stuvaOmListan();
-		    System.out.println("Sorterar om listan");			
+		    // System.out.println("Sorterar om listan");			
 		}
 		// vi uppdaterar User.email utan att kolla om den är ändrad. det är enklare hi hi..
 		User user = userService.getUser(id);

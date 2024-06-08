@@ -73,6 +73,13 @@ public class EkonomiController
 	@GetMapping("/ekonomi")
 	public String ekonomi(Model model) 
 	{
+		int antBet = aspRepo.getAmountPaid();
+		model.addAttribute("antpers", aspRepo.getMaxTransactionId());
+   		model.addAttribute("antpassiva", aspRepo.getAmountWithStatus("Passiv"));
+   		model.addAttribute("antvilande", aspRepo.getAmountWithStatus("Vilande"));
+   		model.addAttribute("antbet", antBet);
+   		model.addAttribute("antobet", aspRepo.getAmountNotPaid());
+   		model.addAttribute("kronor", (antBet * 250) + ":-");
 		model.addAttribute("datum", new Date());
 		return "/ekonomi.html";      
 	}  
@@ -119,9 +126,13 @@ public class EkonomiController
 //		model.addAttribute("message", mergedVismaFile + " är skickad till din dator, updatera Visma med filen");
 //		//model.addAttribute("datum", new Date());	
 //		return ekonomi(model);
-		
-		
-		
+	
+	}
+	/*
+	@GetMapping("/ekonomi/rapport")
+	public String ekoRapport(Model model)
+	{
 		
 	}
+	*/
 }

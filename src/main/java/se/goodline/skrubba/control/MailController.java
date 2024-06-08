@@ -57,6 +57,7 @@ import se.goodline.skrubba.repository.UserRepository;
 import se.goodline.skrubba.repository.VisningRepository;
 import se.goodline.skrubba.service.AspirantService;
 import se.goodline.skrubba.service.EmailService;
+import se.goodline.skrubba.service.LoggService;
 import se.goodline.skrubba.service.SkrubbaUserDetailsService;
 import se.goodline.skrubba.utils.FileUtils;
 
@@ -93,6 +94,9 @@ public class MailController
 	@Autowired
 	ServletContext servletContext;
 	
+	@Autowired
+	LoggService loggService;
+	
 	@ModelAttribute("emailForm")
 	public EmailForm createEmailForm() {
 		EmailForm emailForm = new EmailForm(); 
@@ -105,13 +109,16 @@ public class MailController
 	@GetMapping("/mail")
 	public String mainMailPage(@ModelAttribute("emailForm") EmailForm emailForm, Model model) 
 	{		
+		Optional<se.goodline.skrubba.model.Param> param = paramRepo.findByParamName("Mailmottagare");
+		if (param.isPresent())
+			model.addAttribute("message", "All mail är omdirigerad till " + param.get().getParamValue() + ", tag bort paramater Mailmottagare under Underhåll->Inställningar");
 		Urval urval = new Urval();
 		model.addAttribute("urval", urval);		
 		model.addAttribute("emailForm", emailForm);
 		model.addAttribute("mallar", mallRepo.findAll());
 		model.addAttribute("visningar",saluRepo.findPagaende());
 		model.addAttribute("_urval", new String());
-		System.out.println("emailForm:" + emailForm.getSubject());
+		//System.out.println("emailForm:" + emailForm.getSubject());
 	  	return "/mainmail.html";      
 	}  
 	
@@ -154,18 +161,10 @@ public class MailController
 			{	
 				if (aspOrKollo)
 				{
-					aspLista = new ArrayList<Aspirant>();
-					for (String vald: valda.getValda())
+										try 
 					{
-					
-						Aspirant asp = aspRepo.findById(Integer.parseInt(vald));
-						aspLista.add(asp);
-						
-					}
-					try 
-					{
-						
-						eService.sendToAspList(aspLista, emailForm);
+						loggService.add("MAIL", "Skickar email med rubrik " + emailForm.getSubject() + " till " + valda.getValda().size() + " personer i kön");
+						eService.sendToAspList(valda.getValda(), emailForm);
 					} 
 					catch (Exception e) 
 					{
@@ -175,27 +174,25 @@ public class MailController
 				}	
 				else
 				{
-					kolloLista = new ArrayList<Kolonilott>();
-					for (String vald: valda.getValda())
-					{
-						Kolonilott lott = lottRepo.getById(Integer.parseInt(vald));
-						kolloLista.add(lott);
-					}
 					
 					try 
 					{
-						eService.sendToLottList(kolloLista, emailForm);
+						eService.sendToLottList(valda.getValda(), emailForm);
+						loggService.add("MAIL", "Skickar email med rubrik " + emailForm.getSubject() + " till " + valda.getValda().size() + " kolonister");
 					} 
 					catch (Exception e) 
 					{
 						e.printStackTrace();				
 					}
 				}
+				emailForm = new EmailForm();
 				emailForm.setAttachments(null);
 				emailForm.setBilageLista(new ArrayList<>());
 				emailForm.setBody(null);
 				emailForm.setSubject(null);
 				model.addAttribute("emailForm", emailForm);
+				model.addAttribute("message", "Email skickas till valda mottagare i bakgrunden.");
+				
 				return mainMailPage(emailForm, model); 				
 			}
 		}
@@ -276,14 +273,14 @@ public class MailController
 		model.addAttribute("visningar",saluRepo.findPagaende());
 		model.addAttribute("mallar", mallRepo.findAll());
 		model.addAttribute("urval", valda);
-		if (valda.getValda() != null)
-		for (String vald: valda.getValda())
-		{
-			System.out.println(vald);
-			
-		};
-		System.out.println("_urval:" + _urval + " _action: " + _action + " emailForm.rubrik" + emailForm.getSubject());
-		System.out.println("attachments:" + emailForm.getAttachments().getOriginalFilename());
+//		if (valda.getValda() != null)
+//		for (String vald: valda.getValda())
+//		{
+//			System.out.println(vald);
+//			
+//		};
+		//System.out.println("_urval:" + _urval + " _action: " + _action + " emailForm.rubrik" + emailForm.getSubject());
+		//System.out.println("attachments:" + emailForm.getAttachments().getOriginalFilename());
 		model.addAttribute("emailForm", emailForm);
 		model.addAttribute("_urval", _urval);
 		return "/mainmail.html"; 	
@@ -322,6 +319,7 @@ public class MailController
 	public String removeMall(@PathVariable("id") int id, @ModelAttribute("brevmall") Brevmall brevmall,  Model model) 
 	{		
 		mallRepo.deleteById(id);
+		loggService.add("DELETE", "Raderar brevmall " + brevmall.getNamn());
 		model.addAttribute("mallar", mallRepo.findAll());
 		model.addAttribute("mallkatalog", paramRepo.findByParamName("Bilagor").get().getParamValue());
 		model.addAttribute("brevmall", new Brevmall());
@@ -333,8 +331,9 @@ public class MailController
 	public String saveMall(@RequestParam int id, @RequestParam(name = "bilageval", required = false) String[] valdaBilagor, @ModelAttribute("brevmall") Brevmall brevmall, Model model) 
 	{		
 		if (valdaBilagor != null)
-			brevmall.setBilagor(valdaBilagor);
+			brevmall.setBilagor(valdaBilagor);		
 		mallRepo.save(brevmall);		
+		loggService.add("CREATE", "Skapar brevmall " + brevmall.getNamn());
 	  	return "redirect:/mail/edit/mall/" + brevmall.getId();      
 	} 
 	

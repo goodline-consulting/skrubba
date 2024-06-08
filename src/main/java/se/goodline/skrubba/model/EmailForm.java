@@ -2,6 +2,8 @@ package se.goodline.skrubba.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
 import se.goodline.skrubba.model.Brevmall;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,16 +64,27 @@ public class EmailForm
 		this.bilageLista = bilageLista;
 	}
 	
-	public EmailForm(String subject, String body, String footer, MultipartFile attachments) {
+	public EmailForm(String subject, String body, String footer, MultipartFile attachments, List<String> bilageLista) {
 		super();
 		this.subject = subject;
 		this.body = body;
 		this.footer = footer;
 		this.attachments = attachments;
+		this.bilageLista = bilageLista;
 	}
 	@Override
 	public String toString() {
-		return "EmailForm [subject=" + subject + ", body=" + body + ", footer=" + footer + "]";
+		return "EmailForm [subject=" + subject + ", body=" + body + ", footer=" + footer + ", attachments="
+				+ attachments + ", bilageLista=" + bilageLista + "]";
 	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(attachments, bilageLista, body, footer, subject);
+	}
+	
+	public EmailForm clone() {
+		return new EmailForm(this.subject, this.body, this.footer, this.attachments, this.bilageLista);
+	}
+	
 	
 }

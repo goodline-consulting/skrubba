@@ -1,5 +1,7 @@
 package se.goodline.skrubba.model;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,7 +16,7 @@ public class Anmalan
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     private String fnamn;
     private String enamn;
@@ -23,25 +25,17 @@ public class Anmalan
     private String adress;
     private String postnr;
     private String padress;
+    private Date   inkom;
 	
     
-    public Anmalan(Long id, String fnamn, String enamn, String telefon, String email, String adress, String postnr,
-			String padress) {
-		super();
-		this.id      = id;
-		this.fnamn   = fnamn;
-		this.enamn   = enamn;
-		this.telefon = telefon;
-		this.email   = email;
-		this.adress  = adress;
-		this.postnr  = postnr;
-		this.padress = padress;
+	public Anmalan() {
+		this.inkom = new Date();
 	}
-    
-	public Long getId() {
+	
+	public int getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getFnamn() {
@@ -87,10 +81,19 @@ public class Anmalan
 		this.padress = padress;
 	}
 	
+	public Date getInkom() {
+		return inkom;
+	}
+
+	public void setInkom(Date inkom) {
+		this.inkom = inkom;
+	}
+
 	@Override
 	public String toString() {
 		return "Anmalan [id=" + id + ", fnamn=" + fnamn + ", enamn=" + enamn + ", telefon=" + telefon + ", email="
-				+ email + ", adress=" + adress + ", postnr=" + postnr + ", padress=" + padress + "]";
+				+ email + ", adress=" + adress + ", postnr=" + postnr + ", padress=" + padress + ", inkom=" + inkom
+				+ "]";
 	}
 
     // Constructors, getters, and setters

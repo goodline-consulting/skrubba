@@ -53,14 +53,14 @@ public class HomeController {
 	@GetMapping("/")
     public String home(Principal loggedInUser, Model model) 
     {   
-    	Optional<Param> param = paramRepo.findByParamName("LOGGNING");
+    	
     	Optional<User> user = userRepo.findByUserName(loggedInUser.getName());
-    	if (param.isPresent() && param.get().getParamValue().contains("LOGIN"))
-    		loggService.add("LOGIN", "Login by " + user.get().getUserName() + " with role " + user.get().getRoles());
+    	loggService.add("LOGIN", "Login by " + user.get().getUserName() + " with role " + user.get().getRoles());
     	
     	if (user.get().getRoles().compareTo("ROLE_ADMIN") == 0)
     	{
-    		model.addAttribute("admin", aspRepo.getById(user.get().getId()));
+    		
+    		model.addAttribute("admin", user.get());
     		return ("/index.html");
     	}	
     	else 
@@ -81,13 +81,16 @@ public class HomeController {
 	public String saveParam(@ModelAttribute("ny_param") Param param_ny, Model model) 
 	{					
 		paramRepo.save(param_ny);
+		loggService.add("CREATE", "Skapar ny parameter " + param_ny.getParamName());
 		return "redirect:/params";		
 	}	
 	
 	@PostMapping("/param/delete/{id}")
 	public ResponseEntity<String> deleteParam(@PathVariable String id)
 	{
+		Optional<Param> par = paramRepo.findByParamName(id);
 		paramRepo.deleteByParamName(id);
+		loggService.add("DELETE", "Tar bort parameter " + par.get().getParamName());
 		return ResponseEntity.ok().body("{}");
 	}
 }		
