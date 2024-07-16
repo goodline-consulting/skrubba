@@ -51,7 +51,7 @@
 					    <td width="300"><input type = "text" name = "email"	th:field = "*{email}" class = "form-control" placeholder="Ange E-postadress"/></td>
 						</tr>
 						<tr><td><br></td><td></td></tr>
-						<tr><td></td><td><button type="submit" class = "btn btn-primary">Radera</button><a th:href="${cancelUrl}" id="cancel" name="cancel" class="btn btn-default">Avbryt</a></td></tr>	
+						<tr><td></td><td><button type="submit" class = "btn btn-primary">Radera</button><a th:href="@{${cancelUrl}}" id="cancel" name="cancel" class="btn btn-default">Avbryt</a></td></tr>	
 					    </table>
 						</form>					
 					</div>

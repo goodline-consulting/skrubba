@@ -23,8 +23,8 @@
 		  	<li class="nav-item active">
 		      	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
 		    </li>
-		    <li th:if = "${lott.tillsalu}" class="nav-item">
-      			<a class="nav-link" th:href="@{/tillsalulista/{lottnr} (lottnr=${lottnr})}"><span class="fa fa-shopping-cart"></span>Till Salu</a>
+		    <li class="nav-item">
+      			<a class="nav-link" th:href="@{/tillsalulista/{lottnr} (lottnr=${lottnr})}"><span class="fa fa-shopping-cart"></span>Försäljningar</a>
           	</li> 
 		  </ul>                            
 		  <ul class="nav navbar-nav ">		
@@ -97,9 +97,10 @@
   						
   						<tr>
   						<td>Till salu:</td>
-  						<td><input type="checkbox" name="tillsalu" th:checked="*{tillsalu}" align="right"> </td>
+  						<td><input type="checkbox" name="tillsalu" th:checked="*{tillsalu}" align="right" disabled="disabled"> </td>
   						</tr>
-						<tr><td></td><td align="right"><button type="submit" class = "btn btn-primary">Spara</button></td></tr>	
+  						
+<!-- 						<tr><td></td><td align="right"><button type="submit" class = "btn btn-primary">Spara</button></td></tr>	 -->
 					    </table>
 						</form>					
 					</div>

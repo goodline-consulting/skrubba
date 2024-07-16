@@ -60,16 +60,17 @@
 			<tr>					
 				<th> Köplats</th>
 				<th> Namn </th>
-				<th> Email </th>				
-				<th>&nbsp;</th>					
+				<th> Svar </th>
+				<th> Inskriven </th>				
+							
 			</tr>
 		</thead>			
 		<tbody>
 			<tr th:each = "aspirant : ${aspirantlista}">
 				<td th:text = "${aspirant.koPlats}"></td>					
 				<td th:text = "${aspirant.fnamn + ' ' + aspirant.enamn}"></td>
-				<td> <a th:href = "'mailto:' + ${aspirant.email}"> <i th:text = "${aspirant.email}"></i></a></td>
-				
+				<td th:text = "${svarlista[aspirant.id]}"></td>
+				<td th:text = "${#dates.format(aspirant.inskriven, 'yyyy-MM-dd')}"></td>				
 			</tr>
 		</tbody>		
 	</table>

@@ -29,10 +29,13 @@
   </ul>
   
   <ul class="nav navbar-nav ">
-      
+      <li class="nav-item">
+      		<a class="nav-link" th:href="@{/tillsalu/new/0}"><span class="fa fa-shopping-cart"></span>Ny Försäljning</a>
+      </li>    
       <li th:if = "${lottnr == 0}"class="nav-item"><a class="nav-link" th:href="@{/}"><span class="fa fa-sign-in"></span> Tillbaka</a></li>
       <li th:if = "${lottnr > 0}"class="nav-item"><a class="nav-link" th:href="@{/kolonilott/edit/{lottnr}(lottnr=${lottnr})}"><span class="fa fa-sign-in"></span> Tillbaka</a></li>
     </ul> 
+    
 </nav>
 </div>
 
@@ -67,7 +70,12 @@
 						<a th:href = "@{/tillsalu/edit/{id}/{lottnr} (id=${tillsalu.id}, lottnr=${urval})}"
 						 class = "btn btn-primary">Ändra</a>	
 						<a th:if = "${tillsalu.visdatum != null}" th:href = "@{/visning/valj/{id}/{lottnr} (id=${tillsalu.id}, lottnr=${urval})}"
-						 class = "btn btn-primary">Visning</a>	 			 
+						 class = "btn btn-primary">Visning</a>	
+						 <a th:if = "${tillsalu.visdatum != null}" th:href = "@{/visning/svar/{id}/{lottnr} (id=${tillsalu.id}, lottnr=${urval})}"
+						 class = "btn btn-primary">Svar</a>	 
+						 <a th:if = "${tillsalu.saljdatum == null}" th:href = "@{/tillsalu/remove/{id} (id=${tillsalu.id})}"
+						 class = "btn btn-primary" onclick="return confirm('Är du säker på att du vill ta bort försäljingen')">Ta bort</a>	 
+<!-- 						 class = "fa fa-trash-o"></a>	 			  -->
 					</td>
 				</tr>
 			</tbody>

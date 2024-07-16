@@ -11,6 +11,13 @@ import se.goodline.skrubba.model.Anmalan;
 public interface AnmalanRepository extends JpaRepository<Anmalan, Integer> 
 {
 
+	@Query(value = "SELECT COUNT(id) FROM anmalan a WHERE email = ?1", nativeQuery=true)
+    public int countByEmail(String email);
+   
+    default boolean findExistByEmail(String email) 
+    {
+        return (countByEmail(email) > 0);
+    }
 }
 
 

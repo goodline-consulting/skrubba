@@ -11,14 +11,15 @@
     <link href="https://getbootstrap.com/docs/4.0/examples/signin/signin.css" rel="stylesheet" crossorigin="anonymous"/>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <style>		
+	   .custom-form-group {
+	    	margin-bottom: 5px; /* Adjust the value as needed to reduce the spacing */
+	   }		   
+   </style>
   </head>
   
   <body style='background-color:white'>
-		   <style>
-		    .custom-form-group {
-		        margin-bottom: 5px; /* Adjust the value as needed to reduce the spacing */
-		    }
-		   </style>
+		
 		   <script>
 		   function validateAndSubmitForm() {
 			    var form = document.getElementById('anmform');
@@ -33,7 +34,7 @@
  		<img th:src="@{/images/skrubbalogga.jpg}" class="img-rounded" alt="Skrubbas Logga">   
       
         <p></p>
-        <nav class="navbar navbar-expand-sm navbar-light bg-light">
+        <nav th:if = "${message == null}" class="navbar navbar-expand-sm navbar-light bg-light">
 		  <ul class="navbar-nav mr-auto">
 		  	<li class="nav-item active">
 		      	<a class="nav-link" href="#"><span class="fa fa-home"></span>Fyll i din anmälan till stugkön eller tryck på Avbryt</a>
@@ -42,7 +43,7 @@
 		  </ul>
 		  <ul class="nav navbar-nav ">
 		      
-		      <li class="nav-item"><a class="nav-link" href="https://skrubba.hjartstrom.se/om-foreningen/intresseanmalan-till-stugko/"><span class="fa fa-sign-in"></span> Avbryt</a></li>
+		      <li class="nav-item"><a class="nav-link" href="https://skrubba.se"><span class="fa fa-sign-in"></span> Avbryt</a></li>
 		     
 		  </ul>
 		</nav>
@@ -50,55 +51,51 @@
 
         <div> 
         	<div th:if = "${message != null}" class="alert alert-success alert-dismissible fade show"  role="alert">
-        		[[${message}]]
-        		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        		<span th:utext="${message}"></span>
+        		<button type="button"  onclick="window.location.href='https://skrubba.se';" class="close" data-dismiss="alert" aria-label="Close">
     				<span aria-hidden="true">&times;</span>
   				</button> 
+        	</div>
+        	<div th:if = "${errmess != null}" class="alert alert-danger alert-dismissible fade show"  role="alert">
+        		<span th:utext="${errmess}"></span>
         	</div>
         </div>
     </div>	        
         <br>		
-    <div class="container">
+    <div th:if = "${message == null}" class="container">
      <div class="row justify-content-center">
-        <div class="col-md-6">
+        <div class="col-md-8">
 
 			<form id="anmform" role="form" th:action="@{/anmalan}" th:object = "${anmalan}" method="POST"> 
-			<div class="form-row">
-    			<div class="form-group col-md-6">
-      				<label for="fnamn">Förnamn</label>				
-					<input type = "text" name = "fnamn"	th:field = "*{fnamn}" class = "form-control" placeholder="Ange förnamn" required/>
-				</div>						
-				<div class="form-group col-md-6">
-      				<label for="enamn">Efternamn</label>
-					<input type = "text" name = "enamn"	th:field = "*{enamn}" class = "form-control" placeholder="Ange efternamn" required/>				
-				</div>
-			</div>		
-			<div class="form-group">
-				<label for="fnamn">Adress</label>
-				<input type = "text" name = "adress" th:field = "*{adress}" class = "form-control" placeholder="Ange gatuadress" required/>
-			</div>
-			<div class="form-row">
-    			<div class="form-group col-md-6">
-      				<label for="fnamn">Postnummer</label>				
-					<input type = "text" name = "postnr" th:field = "*{postnr}"	class = "form-control" placeholder="Ange postnummer" required/>
-				</div>						
-				<div class="form-group col-md-6">
-      				<label for="enamn">Postadress</label>
-					<input type = "text" name = "postAdress" th:field = "*{padress}" class = "form-control" placeholder="Ange postadress" required/>				
-				</div>
-			</div>		
-			<div class="form-row">
-    			<div class="form-group col-md-6">
-      				<label for="fnamn">E-post</label>				
-					<input type = "email" name = "email" th:field = "*{email}" class = "form-control" placeholder="Ange E-postadress" required/>
-				</div>						
-				<div class="form-group col-md-6">
-      				<label for="enamn">Telefonummer</label>
-					<input type = "text" name = "telefon" th:field = "*{telefon}" class = "form-control" placeholder="Ange telefonnummer" required/>		
-				</div>
-			</div>			
-			<button type="submit" class="btn btn-primary">Skicka anmälan</button>
-					
+			<table align="center">
+				<tr><td>Förnamn:</td>
+					<td style="width: 300px;"><input type = "text" name = "fnamn"	th:field = "*{fnamn}" class = "form-control" placeholder="Ange förnamn" required/></td>
+  				</tr>
+				<tr><td>Efternamn:</td>
+					<td><input type = "text" name = "enamn"	th:field = "*{enamn}" class = "form-control" placeholder="Ange efternamn" required/></td>
+  				</tr>
+				<tr><td>Adress:</td>
+					<td><input type = "text" name = "adress" th:field = "*{adress}" class = "form-control" placeholder="Ange gatuadress" required/></td>
+  				</tr>
+				<tr><td>Postnummer:</td>
+					<td><input type = "text" name = "postnr" th:field = "*{postnr}"	class = "form-control" placeholder="Ange postnummer" required/></td>
+  				</tr>
+    			<tr><td>Postadress:</td>
+					<td>
+						<input type = "text" name = "postAdress" th:field = "*{padress}" class = "form-control" placeholder="Ange postadress" required/>
+						
+					</td>
+  				</tr>
+				<tr><td>Mailadress:</td>
+					<td><input type = "email" name = "email" th:field = "*{email}" class = "form-control" placeholder="Ange E-postadress" required/></td>
+  				</tr>
+      			<tr><td>Telefonummer</td>
+					<td><input type = "text" name = "telefon" th:field = "*{telefon}" class = "form-control" placeholder="Ange telefonnummer" required/></td>
+  				</tr>	
+  				<tr style="height: 20px;"><td>&nbsp;</td><td>&nbsp;</td></tr>
+      			<tr>
+      				<td colspan="2" align="center"><button type="submit" class = "btn btn-primary">Skicka anmälan</button></td></tr>	
+		  </table>
 		</form>		
 		</div>
 		</div>	

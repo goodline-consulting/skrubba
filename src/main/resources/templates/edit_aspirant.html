@@ -42,11 +42,11 @@
 		  </ul>
 		  <ul class="nav navbar-nav ">
 		      <button type="submit" class="btn btn-link nav-link" form="aspform" ><span class="fa fa-floppy-o"></span> Spara</button>		  	  
-		  	  <li th:if = "${Role != null}" class="nav-item"><a class="nav-link" th:href="@{/aspirant/remove/{id}(id=${aspirant.id})}"><span class="fa fa-trash"></span> Radera</a></li>
+		  	 
 		  	  <li th:if = "${Role == null}" class="nav-item"><a class="nav-link" th:href="@{/aspirant/change_password/{id}(id=${aspirant.id})}"><span class="fa fa-user"></span> Byt lösenord</a></li>
 		      <li th:if = "${Role != null}" class="nav-item"><form id="fake2" th:action="@{/send_reset_link}" method="post"><input type="hidden" name="id" th:value="${aspirant.id}">
-		      		<a class="nav-link" href="#" onclick="document.getElementById('fake2').submit()"><span class="fa fa-user"></span> Skicka lord</a></form></li>
-		      
+		      		<a class="nav-link" href="#" onclick="document.getElementById('fake2').submit()"><span class="fa fa-user"></span> Nytt lösenord</a></form></li>
+		       <li th:if = "${Role != null}" class="nav-item"><a class="nav-link" th:href="@{/aspirant/remove/{id}(id=${aspirant.id})}"><span class="fa fa-trash"></span> Radera</a></li>
 		      <li th:if = "${Role == null}" class="nav-item"><a class="nav-link" th:href="@{/userpage/{id}(id=${aspirant.id})}"><span class="fa fa-sign-in"></span> Avbryt</a></li>
 		      <li th:if = "${Role != null}" class="nav-item"><a class="nav-link" th:href="@{/aspirantlista}"><span class="fa fa-sign-in"></span> Avbryt</a></li>
 		  </ul>

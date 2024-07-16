@@ -26,7 +26,7 @@ public class Anmalan
     private String postnr;
     private String padress;
     private Date   inkom;
-	
+	private Date   mailat;
     
 	public Anmalan() {
 		this.inkom = new Date();
@@ -88,11 +88,19 @@ public class Anmalan
 	public void setInkom(Date inkom) {
 		this.inkom = inkom;
 	}
+	
+	public Date getMailat() {
+		return mailat;
+	}
+
+	public void setMailat(Date mailat) {
+		this.mailat = mailat;
+	}
 
 	@Override
 	public String toString() {
 		return "Anmalan [id=" + id + ", fnamn=" + fnamn + ", enamn=" + enamn + ", telefon=" + telefon + ", email="
-				+ email + ", adress=" + adress + ", postnr=" + postnr + ", padress=" + padress + ", inkom=" + inkom
+				+ email + ", adress=" + adress + ", postnr=" + postnr + ", padress=" + padress + ", inkom=" + inkom + ", mailat=" + mailat
 				+ "]";
 	}
 

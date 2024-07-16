@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 
 import se.goodline.skrubba.model.Visning;
+import se.goodline.skrubba.model.VisningId;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,9 +15,10 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 
 @Repository
-public interface VisningRepository extends JpaRepository<Visning, Integer> 
+public interface VisningRepository extends JpaRepository<Visning, VisningId> 
 {
-    Optional<Visning> findById(int id);
+	@Query(value = "SELECT * from visning v where v.id = ?1 and v.asp = ?2", nativeQuery = true)
+    Optional<Visning> findById(int id, int asp);
            
     @Query(value = "SELECT * from visning v where v.asp = ?1", nativeQuery = true)
     public List<Visning> findByAspId(int aspId);    

@@ -92,6 +92,20 @@ public class EmailService
         mailSender.send(message);
        
     }  
+	public void sendEmail(String recipientEmail, String subject, String body) throws MessagingException, IOException
+	{
+		String mailMottagare = paramRepo.findByParamName("Mailmottagare").isPresent() ? paramRepo.findByParamName("Mailmottagare").get().getParamValue() : null;
+		MimeMessage message = mailSender.createMimeMessage();              
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);                       
+        
+        helper.setFrom("styrelsen@skrubba.se", "Skrubba stugkö");
+        helper.setTo(mailMottagare == null ? recipientEmail : mailMottagare);  
+        helper.setSubject(subject);         
+        helper.setText(body, false);
+        mailSender.send(message);
+		loggService.add("MAIL", "Email med rubrik " + subject + " skickat till " + recipientEmail);
+	}
+	
 	public void sendEmail(String recipientEmail, EmailForm em) throws MessagingException, IOException
 	{
 		String folder = null;

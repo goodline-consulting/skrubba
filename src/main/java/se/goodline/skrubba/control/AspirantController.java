@@ -63,7 +63,7 @@ public class AspirantController
 	@Autowired
 	TillSaluRepository saluRepo;
 	
-	
+	/*
 	@GetMapping("/aspirantlista")
 	public String aspirantLista(Model model) 
 	{		
@@ -85,6 +85,43 @@ public class AspirantController
 		model.addAttribute("aspLista", aspLista);
 		model.addAttribute("visLista", visLista);
 		return "/aspirantlista.html";      
+	}
+	*/
+	@GetMapping("/aspirantlista")
+	public String aspirantLista(Model model) {
+	    List<Aspirant> aspLista = aspRepo.findAll();
+	    if (aspLista == null) {
+	        aspLista = new ArrayList<>();
+	    }
+
+	    Map<Integer, List<Tillsalu>> visLista = new HashMap<>();
+	    for (Aspirant asp : aspLista) {
+	        int visningar = aspirantService.visningar(asp.getId());
+	        
+	        asp.setVisningar(visningar);
+
+	        if (asp.getVisningar() > 0) {
+	            List<Tillsalu> saluLista = new ArrayList<>();
+	            List<Visning> visningarList = visRepo.findByAspId(asp.getId());
+	            if (visningarList != null) {
+	                for (Visning vis : visningarList) {
+	                    if (vis != null) {
+	                        Optional<Tillsalu> salu = saluRepo.findById(vis.getId());
+	                        salu.ifPresent(saluLista::add);
+	                    } else {
+	                        System.err.println("Found null Visning in list for Aspirant ID: " + asp.getId());
+	                    }
+	                }
+	            } else {
+	                System.err.println("visRepo.findByAspId returned null for Aspirant ID: " + asp.getId());
+	            }
+	            visLista.put(asp.getId(), saluLista);
+	        }
+	    }
+
+	    model.addAttribute("aspLista", aspLista);
+	    model.addAttribute("visLista", visLista);
+	    return "/aspirantlista.html";
 	}
 	
 	@GetMapping("/aspirant/new")
@@ -223,7 +260,7 @@ public class AspirantController
 	public String removeAspirant(@ModelAttribute("aspirant") Aspirant aspirant, Model model) 
 	{		    
 		    int cnt = 1, cntAkt = 1;
-		    System.out.println(aspirant.getEmail() + " " + aspirant.getId());
+		    // System.out.println(aspirant.getEmail() + " " + aspirant.getId());
 		    aspirantService.removeAspirant(aspirant.getId());
 		    
 			model.addAttribute("message", aspirant.getFnamn() + " " + aspirant.getEnamn() + " har plockats bort ifrån kön!");					

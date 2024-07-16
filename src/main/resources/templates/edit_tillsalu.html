@@ -26,7 +26,7 @@
 		    
 		  </ul>
 		  <ul class="nav navbar-nav ">		
-		  	  <li class="nav-item"><a class="nav-link" th:href="${tillbaka}"><span class="fa fa-sign-in"></span> Tillbaka	</a></li>
+		  	  <li class="nav-item"><a class="nav-link" th:href="@{${tillbakaUrl}}"><span class="fa fa-sign-in"></span> Tillbaka	</a></li>
 		  </ul>
 		</nav>
 		
@@ -50,9 +50,12 @@
 						<form class=class="form-inline" role="form" th:action="@{/tillsalu/save}" th:object = "${tillsalu}" method="POST">						
 						<table>
 						<input type="hidden" name = "id" th:value="*{id}" />
+						<!-- 
 						<input type="hidden" name = "sparurl" id = "sparurl" th:value="${tillbaka}" />
+						-->
 						<tr><td>Lottnr:</td>
-						<td><input name="lottnr" th:field = "*{lottnr}" readonly="readonly" class="form-control" placeholder="Ange lottnr"></td>
+						<td th:if = "${lottnr != 0}"><input name="lottnr" th:field = "*{lottnr}" readonly="readonly" class="form-control" placeholder="Ange lottnr"></td>
+						<td th:if = "${lottnr == 0}"><input name="lottnr" th:field = "*{lottnr}"  class="form-control" placeholder="Ange lottnr"></td>
   						</tr>
   						<tr>
   						<td>Visas:</td>
@@ -60,7 +63,11 @@
   						</tr>
   						<tr>
   						<td>Såld:</td>
-  						<td><input name = "saljdatum"	th:field = "*{saljdatum}"  class = "form-control" placeholder="ange saljdatum"/></td>
+  						<td><input type = "date" name = "saljdatum"	th:field = "*{saljdatum}"  class = "form-control" placeholder="ange saljdatum"/></td>
+  						</tr>
+  						<tr>
+  						<td>Köpare:</td>
+  						<td><input name = "saldtill"	th:field = "*{saldtill}"  class = "form-control" placeholder="ange köparens namn"/></td>
   						</tr>
   						<tr>
   						<td><p></p></td>

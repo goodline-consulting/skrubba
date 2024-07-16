@@ -16,21 +16,7 @@
         }
     </style>
     <script th:inline="javascript">
-        function showAddParamForm() {
-        	var form = document.getElementById('addParamForm');
-            if (form.style.display == 'table-row')
-            	form.submit();
-            else
-            {	
-        		var linkElement = document.getElementById('regsave');
-        		linkElement.innerHTML = '<span class="fa fa-floppy-o"></span> Spara parameter';
-       
-            	var row = document.getElementById('addParamRow');
-            	row.style.display = 'table-row';
-            	var form = document.getElementById('addParamForm');
-            	form.style.display = 'table-row';
-            }	
-        }
+        
        
         function removeRow(button) {
             // Get the <tr> element containing the button
@@ -92,45 +78,48 @@
   	<li class="nav-item active">
       	<a class="nav-link" href="http://skrubba.se"><span class="fa fa-home"></span>Skrubba.se</a>
     </li>
-    <li class="nav-item active"><a id="regsave" class="nav-link" href="javascript:showAddParamForm()"><span class="fa fa-credit-card"></span> Ny parameter</a></li>    
+    
   </ul>  
   <ul class="nav navbar-nav ">		
-	  <li class="nav-item"><a class="nav-link" th:href="@{/}"><span class="fa fa-sign-in"></span> Tillbaka	</a></li>
+	  <li class="nav-item"><a class="nav-link" th:href="@{/kolonilista}"><span class="fa fa-sign-in"></span> Tillbaka	</a></li>
   </ul> 
    
 </nav>
 </div>
 <br>
-<div id="deleteButton" th:attr="data-delete-url=@{/param/delete/}"></div>
+<div id="deleteButton" th:attr="data-delete-url=@{/andring/delete/}"></div>
 
-	
-<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center">		
-	
-    <table class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>Parameternamn</th>
-                <th>Värde</th>		                
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:data-id="${parameter.paramName}" th:each="parameter : ${params}">
-                <td th:text="${parameter.paramName}"></td>
-                <td th:text="${parameter.paramValue}"></td>
-                <td width="5%"><span class="fa fa-trash-o" aria-hidden="true" onclick="removeRow(this)"></span></td>
-            </tr>
-            <tr data-id="0" id="addParamRow" style="display: none;">
-            <form  id="addParamForm" th:action="@{/param/ny}" th:object="${ny_param}" method="post" style="display: none;">
-      				<td><input type="text" class="form-control" id="paramName" th:field="*{paramName}" required></td>
-      				<td><input type="text" class="form-control" id="paramValue" th:field="*{paramValue}" required></td>                         
-                      <td width="5%"><span class="fa fa-trash-o" aria-hidden="true" onclick="removeRow(this)"></span></td>        
-  				</form>
-            </tr>
-        </tbody>
-    </table>
-    <!-- Form for adding a new payment -->
-  
+	<div class = "row">
+		<div class =" container col-lg-6 col-md-6 col-sm-6 justify-content-center ">		
+			
+		    <table class="table table-striped table-bordered">
+		        <thead>
+		            <tr>
+		                <th>Datum</th>
+		                <th>User</th>
+		                <th>Lottnr</th>
+		                <th>Nya uppgifter</th>		                
+		            </tr>
+		        </thead>
+		        <tbody>
+		            <tr th:data-id="${andring.id}" th:each="andring : ${andringLista}">
+		                <td th:text="${#dates.format(andring.tidpunkt, 'yyyy-MM-dd')}"></td>
+		                <td th:text="${andring.user}"></td>
+		                <td style='width:8%' th:text="${andring.lottnr}"></td>
+		                <td> <pre th:utext="${andring.note}"></pre></td>
+		                <td width="5%"><span class="fa fa-trash-o" aria-hidden="true" onclick="removeRow(this)"></span></td>
+		            </tr>
+		            <tr data-id="0" id="addFakeRow" style="display: none;">
+		            <form  id="addFakeForm" th:action="@{/}" method="post" style="display: none;">
+        				<td><input type="text" class="form-control" id="fakeName"></td>
+        				        
+    				</form>
+		            </tr>		            		           
+		        </tbody>
+		    </table>		     		     		
+ 	</div>
+ </div>
     
-</div>
+    
 </body>
 </html>

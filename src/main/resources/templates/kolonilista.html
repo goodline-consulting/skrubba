@@ -67,6 +67,10 @@
 	  			</div>
 			</div>	    
 	    </li>
+	    
+	    <li class="nav-item" style="margin-left: 15px";>
+      		<a class="nav-link" th:href="@{/andringar}"><span class="fa fa-file-o"></span>Uppdateringar</a>
+    	</li>
 	  </ul>
 	  <ul class="nav navbar-nav ">
 	      
@@ -113,7 +117,7 @@
 					<td th:if="${!lott.tillsalu}"></td>
 					<td>
 						<a th:href = "@{/kolonilott/edit/{lottnr}(lottnr=${lott.lottnr})}"
-						 class = "btn btn-primary">Ändra</a>				 
+						 class = "btn btn-primary">Visa</a>				 
 					</td>
 				</tr>
 			</tbody>

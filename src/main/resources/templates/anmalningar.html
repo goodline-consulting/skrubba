@@ -54,7 +54,9 @@
 			      </div>
 			      <div class="modal-body">
 			      <table class="table table-striped table-bordered">
-			      		<tr><td>Inkom</td><td th:text = "${#dates.format(anmalan.inkom, 'yyyy-MM-dd HH:MM:SS')}"></td></tr>
+			      		<tr><td>Inkom</td><td th:text = "${#dates.format(anmalan.inkom, 'yyyy-MM-dd HH:MM:SS')}"></td></tr>		      		
+			      		<tr><td>Avinummer</td><td th:text = "${anmalan.id + 1000}"></td></tr>
+			       		<tr><td>Bekräftad</td><td th:text = "${#dates.format(anmalan.mailat, 'yyyy-MM-dd HH:MM:SS')}"></td></tr>
 			       		<tr><td>Förnamn</td><td th:text = "${anmalan.fnamn}"></td></tr>
 			       		<tr><td>Efternamn</td><td th:text = "${anmalan.enamn}"></td></tr>
 			       		<tr><td>Email</td><td th:text = "${anmalan.email}"></td></tr>
@@ -87,7 +89,9 @@
 					<td th:text = "${anmalan.padress}"></td>
 					<td>
 						<button type="button" class="btn btn-primary" data-toggle="modal" th:data-target="${'#anm' + anmalan.id}">Visa</button>				
-					    <a th:href = "@{/anmalningar/add/{id}(id=${anmalan.id})}" class = "btn btn-primary" onclick="return confirm('Om du lägger till personen till kön så skickas även en betalningsbekrätelse. Är du säker på att betalningen komit in?')">Lägg till</a>
+						<a th:if="${anmalan.mailat == null}" th:href = "@{/anmalningar/confirm/{id}(id=${anmalan.id})}" class = "btn btn-primary">Bekräfta</a>
+						<a th:if="${anmalan.mailat != null}" th:href = "@{/anmalningar/confirm/{id}(id=${anmalan.id})}" class = "btn btn-primary" onclick="return confirm('Bekräftelsemail har redan skickats, är du säker på att du vill skicka ett nytt mail?')">Bekräfta</a>						
+					    <a th:href = "@{/anmalningar/add/{id}(id=${anmalan.id})}" class = "btn btn-primary" onclick="return confirm('Om du lägger till personen till kön så skickas även en betalningsbekrätelse. Är du säker på att betalningen komit in?')">Godkänn</a>
 						<a th:href = "@{/anmalningar/delete/{id}(id=${anmalan.id})}" class = "btn btn-primary" onclick="return confirm('Är du säker på att du vill ta bort anmälan?')">Ta bort</a>
 					</td>
 					

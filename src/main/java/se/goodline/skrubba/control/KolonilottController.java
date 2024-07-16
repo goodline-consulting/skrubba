@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,18 +30,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import net.bytebuddy.utility.RandomString;
+import se.goodline.skrubba.model.Andring;
 import se.goodline.skrubba.model.Aspirant;
 import se.goodline.skrubba.model.Kolonilott;
 import se.goodline.skrubba.model.Tillsalu;
 import se.goodline.skrubba.model.User;
+import se.goodline.skrubba.repository.AndringRepository;
 import se.goodline.skrubba.repository.AspirantRepository;
 import se.goodline.skrubba.repository.KoloniLottRepository;
+import se.goodline.skrubba.repository.LoggRepository;
 import se.goodline.skrubba.repository.TillSaluRepository;
 import se.goodline.skrubba.repository.UserRepository;
 import se.goodline.skrubba.repository.VisningRepository;
 import se.goodline.skrubba.service.AspirantService;
 import se.goodline.skrubba.service.EmailService;
 import se.goodline.skrubba.service.KoloniLoader;
+import se.goodline.skrubba.service.LoggService;
 import se.goodline.skrubba.service.SkrubbaUserDetailsService;
 
 
@@ -62,6 +67,11 @@ public class KolonilottController
 	@Autowired
 	VisningRepository visRepo;
 	
+	@Autowired
+	private LoggService loggService;
+	
+	@Autowired
+	AndringRepository andringRepo;
 	
 	@GetMapping("/kolonilista")
 	public String koloniLista(Model model) 
@@ -75,12 +85,15 @@ public class KolonilottController
 	@GetMapping("/kolonilott/edit/{lottnr}")
 	public String showKoloniForm(@PathVariable int lottnr, Model model) 
 	{		
-		model.addAttribute("lott", lottRepo.getById(lottnr));	
-		//model.addAttribute("ActionUrl", "/kolonilott/edit/");
+		Kolonilott lott = lottRepo.getById(lottnr);	
+		/*
 		Optional<Tillsalu> salu = saluRepo.findPagaende(lottnr);
 		
 		if (salu.isPresent())
-			model.addAttribute("saluid", salu.get().getId());
+			//model.addAttribute("saluid", salu.get().getId());
+			lott.setTillsalu(true);
+		*/	
+		model.addAttribute("lott", lott);
 		return "/edit_kolonilott.html";
 	}
 	
@@ -88,7 +101,7 @@ public class KolonilottController
 	public String updateKoloniForm(@ModelAttribute("lott") Kolonilott lott,	Model model) 
 	{	
 		Optional<Tillsalu> salu = null;
-		
+		/*
 		if (lott.isTillsalu())
 		{
 			salu = saluRepo.findPagaende(lott.getLottnr());
@@ -111,6 +124,7 @@ public class KolonilottController
 		Kolonilott orgLott = lottRepo.getByLottnr(lott.getLottnr());
 		orgLott.setTillsalu(lott.isTillsalu());
 		lottRepo.save(orgLott);
+		*/
 		return "redirect:/kolonilista";		
 	}
 	
@@ -136,17 +150,33 @@ public class KolonilottController
 		for (Kolonilott lott : lottList)
 		{			
 		
-			Optional <Kolonilott> orgLott = lottRepo.findById(lott.getLottnr());
-			if (orgLott.isPresent())
+			Optional <Kolonilott> orgLottOpt = lottRepo.findById(lott.getLottnr());
+			if (orgLottOpt.isPresent())
 			{
-				orgLott.get().setAgare(lott.getAgare());
-				orgLott.get().setEmail(lott.getEmail());
-				orgLott.get().setHemadress(lott.getHemadress());
-				orgLott.get().setLgh(lott.getLgh());
-				orgLott.get().setPostnr(lott.getPostnr());
-				orgLott.get().setPostort(lott.getPostort());
-				orgLott.get().setTelefon(lott.getTelefon());
-				lottRepo.save(orgLott.get());		
+				// Kolla om något av namn, hemadress, lgh, postnr eller postor är ändrat.
+				Kolonilott orgLott = orgLottOpt.get();
+			
+				if ((orgLott.getAgare().compareToIgnoreCase(lott.getAgare()) != 0) ||
+				    (orgLott.getHemadress().compareToIgnoreCase(lott.getHemadress()) != 0) ||
+				    (orgLott.getPostnr().compareToIgnoreCase(lott.getPostnr()) != 0) ||
+				    (orgLott.getPostort().compareToIgnoreCase(lott.getPostort()) != 0)) 	
+				{
+				    	Andring andring = new Andring(new Date(), loggService.getUser(), lott.getLottnr(), "");
+				    	andring.setNote(lott.getAgare() + "\n" +
+				    					lott.getHemadress() + "\n" +
+				    					lott.getPostnr() + " " +
+				    					lott.getPostort());
+				    	andringRepo.save(andring);
+				    	
+				}
+				orgLott.setAgare(lott.getAgare());
+				orgLott.setEmail(lott.getEmail());
+				orgLott.setHemadress(lott.getHemadress());
+				orgLott.setLgh(lott.getLgh());
+				orgLott.setPostnr(lott.getPostnr());
+				orgLott.setPostort(lott.getPostort());
+				orgLott.setTelefon(lott.getTelefon());
+				lottRepo.save(orgLott);		
 			}
 			else		
 				lottRepo.save(lott);
@@ -170,54 +200,78 @@ public class KolonilottController
 		return "/tillsalulista.html";      
 	}
 	
-	/*
+	
 	@GetMapping("/tillsalu/new/{lottnr}")
 	public String newTillSaluForm(@PathVariable int lottnr, Model model) 
 	{
-		//Tillsalu tillSalu = null;
+		/*
+		Tillsalu tillSalu = new Tillsalu();
+		
 		Kolonilott lott = lottRepo.getById(lottnr);
 		if (lott.isTillsalu())
 			tillSalu = saluRepo.findByLottNr(lottnr);
 		else
 		{
 			tillSalu = new Tillsalu();
-			tillSalu.setLottnr(lottnr);
+			tillSalu.setLottnr(lottnr);			
 		}
+		*/
+		Tillsalu tillSalu = new Tillsalu();		
+		tillSalu.setLottnr(lottnr);
 	  	model.addAttribute("tillsalu", tillSalu);
 		model.addAttribute("ActionUrl", "/tillsalu/save");	
-		model.addAttribute("tillbaka", "/kolonilott/edit/" + lottnr);
+		model.addAttribute("tillbakaUrl", "/tillsalulista/" + lottnr);
 		return "/edit_tillsalu.html";      
 	}  
-	*/
+	
 	@GetMapping("/tillsalu/edit/{id}/{urval}")
 	public String editTillSaluForm(@PathVariable int id, @PathVariable int urval, Model model) 
 	{
 	  	Tillsalu tillSalu = saluRepo.getById(id);	  	
 	  	model.addAttribute("tillsalu", tillSalu);
 		model.addAttribute("ActionUrl", "/tillsalu/save");
-		model.addAttribute("tillbaka", "/tillsalulista/" + urval);
+		model.addAttribute("tillbakaUrl", "/tillsalulista/" + urval);
 		return "/edit_tillsalu.html";      
 	}  
 	
 	@PostMapping("/tillsalu/save")
-	public String saveTillSalu(@ModelAttribute("tillsalu") Tillsalu tillSalu, @Param("sparurlrl") String sparurl, Model model) 
+	public String saveTillSalu(@ModelAttribute("tillsalu") Tillsalu tillSalu,  Model model) 
 	{		
-		if (tillSalu.getSaljdatum() != null)
+		Kolonilott lott = lottRepo.getByLottnr(tillSalu.getLottnr());
+		if (lott == null)
 		{
-			Kolonilott lott = lottRepo.getByLottnr(tillSalu.getLottnr());
-			lott.setTillsalu(false);
-			lottRepo.save(lott);
+			model.addAttribute("message", "Det finns ingen lott med nummer " + tillSalu.getLottnr());
+			model.addAttribute("tillsalu", tillSalu);
+			model.addAttribute("ActionUrl", "/tillsalu/save");
+			model.addAttribute("tillbakaUrl", "/tillsalulista/0");
+			return "/edit_tillsalu.html";      
 		}
-		System.out.println("sparurlrl:" + sparurl);
+		Optional<Tillsalu> salu = saluRepo.findPagaende(lott.getLottnr());
+		if (salu.isPresent() && salu.get().getId() != tillSalu.getId())
+		{
+			model.addAttribute("message", "Det finns redan en pågående försäljning på lott nummer " + tillSalu.getLottnr());
+			model.addAttribute("tillsalu", tillSalu);
+			model.addAttribute("ActionUrl", "/tillsalu/save");
+			model.addAttribute("tillbakaUrl", "/tillsalulista/0");
+			return "/edit_tillsalu.html";      
+		}	
+		lott.setTillsalu(tillSalu.getSaljdatum() != null ? false : true);
+		lottRepo.save(lott);
 		saluRepo.save(tillSalu);		
-		return "redirect:" + sparurl;		
+		return "redirect:/tillsalulista/0";	
 	}
 	
-	@PostMapping("/tillsalu/remove")
-	public String removeTillSalu(@ModelAttribute("tillsalu") Tillsalu tillsalu, Model model) 
+	@GetMapping("/tillsalu/remove/{id}")
+	public String removeTillSalu(@PathVariable int id, Model model) 
 	{		    
-		    
-			return "/tillsalulista.html";      		    	
+		    Tillsalu tillsalu = saluRepo.getById(id);
+		    if (tillsalu.getSaljdatum() != null)
+		    {
+		    	model.addAttribute("message", "Du kan inte ta bort en avslutad försäljning");
+		    }
+		    visRepo.deleteBySaluId(id);
+		    saluRepo.deleteById(id);
+		    return "redirect:/tillsalulista/0";	      		    	
 	}	
 	
 	private static String getSiteURL(HttpServletRequest request) 

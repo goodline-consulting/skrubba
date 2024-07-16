@@ -65,7 +65,7 @@ public class LoggController
 	public String filterLogg(@RequestParam("user") String userName, @RequestParam(value = "dFrom", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date dFrom, @RequestParam(value = "dTo", required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date dTo, Model model) 
 	{		
 		List<Logg> logg = null;
-		System.out.println("user: " + userName + " dFrom: " + (dFrom == null? "null": dFrom) + " dTo: " + (dTo == null? "null" : dTo));
+		//System.out.println("user: " + userName + " dFrom: " + (dFrom == null? "null": dFrom) + " dTo: " + (dTo == null? "null" : dTo));
 		if (dTo == null && dFrom != null)
 		{				
 			Calendar calendar = Calendar.getInstance();

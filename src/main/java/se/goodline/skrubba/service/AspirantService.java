@@ -15,11 +15,13 @@ import net.bytebuddy.utility.RandomString;
 import se.goodline.skrubba.model.Anmalan;
 import se.goodline.skrubba.model.Aspirant;
 import se.goodline.skrubba.model.Betalning;
+import se.goodline.skrubba.model.Histpers;
 import se.goodline.skrubba.model.Param;
 import se.goodline.skrubba.model.User;
 import se.goodline.skrubba.model.userExistsException;
 import se.goodline.skrubba.repository.AspirantRepository;
 import se.goodline.skrubba.repository.BetalningRepository;
+import se.goodline.skrubba.repository.HistPersRepository;
 import se.goodline.skrubba.repository.ParamRepository;
 import se.goodline.skrubba.repository.UserRepository;
 import se.goodline.skrubba.repository.VisningRepository;
@@ -57,6 +59,9 @@ public class AspirantService
 	@Autowired
 	EmailService emailService;
 	
+	@Autowired
+	HistPersRepository histRepo;
+	
 	public Aspirant getAspirantById(int id)
 	{
 		return aspirantRepo.getById(id);			
@@ -64,7 +69,7 @@ public class AspirantService
 	
 	public Aspirant newAspirant(Aspirant asp) throws userExistsException, UnsupportedEncodingException, MessagingException, UsernameNotFoundException
 	{
-		String egenUrl = "stugko.skrubba.se";
+		String egenUrl = "http://stugko.skrubba.se";
 		if (userService.userExists(asp.getEmail()))	
 			throw new userExistsException("Det finns redan en användare med användarnamn" + asp.getEmail());
 		Optional<Param> param = paramRepo.findByParamName("EgenUrl");
@@ -123,6 +128,12 @@ public class AspirantService
 			bet.setBetdatum(asp.getBetalat());
 			betRepo.save(bet);
 		}
+		// Vi måste också uppdater HISTPERS
+		
+		Histpers histpers = histRepo.getById(asp.getId());
+		histpers.setFnamn(asp.getFnamn());
+		histpers.setEnamn(asp.getEnamn());
+		histpers.setInskriven(asp.getInskriven());
 		loggService.add("UPDATE", asp.getFnamn() + " " + asp.getEnamn() + " har uppdaterats ");
 	}
     public int getNextKoPlats()
@@ -134,7 +145,7 @@ public class AspirantService
     public boolean aspirantExists(String email)
     {
     	
-      	return aspirantRepo.findExistByEmail(email) == 1; 
+      	return aspirantRepo.findExistByEmail(email); 
     }
     
     public int visningar(int aspid)

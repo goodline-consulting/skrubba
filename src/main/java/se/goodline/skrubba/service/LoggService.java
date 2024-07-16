@@ -63,7 +63,7 @@ public class LoggService
 	{
 		return loggRepo.findByAll(user, dFrom, dTo);
 	}
-	private String getUser()
+	public String getUser()
 	{
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) 

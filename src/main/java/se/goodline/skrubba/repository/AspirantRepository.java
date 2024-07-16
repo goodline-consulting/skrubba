@@ -16,9 +16,13 @@ public interface AspirantRepository extends JpaRepository<Aspirant, Integer> {
     @Query(value = "SELECT max(ko_plats) FROM aspirant", nativeQuery=true)
     public int getMaxTransactionId();
    
-    @Query(value = "SELECT exists(select count(id) = 1 from aspirant p where email = ?1)", nativeQuery=true)
-    public int findExistByEmail(String email);
+    @Query(value = "SELECT COUNT(id) FROM aspirant p WHERE email = ?1", nativeQuery=true)
+    public int countByEmail(String email);
    
+    default boolean findExistByEmail(String email) 
+    {
+        return (countByEmail(email) == 1);
+    }
     @Query(value = "SELECT * FROM aspirant p where betalat is null order by ko_plats", nativeQuery=true)
     public List<Aspirant> findByNotPaid();
     
@@ -34,7 +38,7 @@ public interface AspirantRepository extends JpaRepository<Aspirant, Integer> {
     @Query(value = "SELECT * FROM aspirant p where ko_status != 'Aktiv' order by ko_plats", nativeQuery=true)
     public List<Aspirant> findByEjAktiva();
     
-    @Query(value = "SELECT * FROM aspirant JOIN visning ON aspirant.id = visning.asp JOIN tillsalu  ON visning.id = tillsalu.id and tillsalu.saljdatum is null WHERE tillsalu.lottnr = ?1 order by ko_plats", nativeQuery=true)
+    @Query(value = "SELECT * FROM aspirant JOIN visning ON aspirant.id = visning.asp JOIN tillsalu  ON visning.id = tillsalu.id and tillsalu.saljdatum is null WHERE tillsalu.lottnr = ?1 order by aspirant.ko_plats", nativeQuery=true)
     public List<Aspirant> findByInvitedToSail(int lottnr);
     
     @Query(value = "SELECT COUNT(a.id) FROM aspirant a WHERE a.ko_status = ?1", nativeQuery=true)

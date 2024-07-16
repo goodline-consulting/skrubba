@@ -16,9 +16,17 @@ public class Tillsalu
 	private Date visdatum;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date saljdatum;
+    private String saldtill;
     
     
-    
+	public String getSaldtill() {
+		return saldtill;
+	}
+
+	public void setSaldtill(String saldtill) {
+		this.saldtill = saldtill;
+	}
+
 	public int getId() {
 		return id;
 	}
