@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import se.goodline.skrubba.model.Param;
 import se.goodline.skrubba.model.User;
+import se.goodline.skrubba.repository.AndringRepository;
 import se.goodline.skrubba.repository.AspirantRepository;
 import se.goodline.skrubba.repository.ParamRepository;
 import se.goodline.skrubba.repository.UserRepository;
@@ -36,6 +37,9 @@ public class HomeController {
 	@Autowired
 	LoggService loggService;
 	
+	@Autowired
+	AndringRepository andringRepo;
+		
 	@GetMapping("/login")
 	public String login()
 	{
@@ -59,7 +63,8 @@ public class HomeController {
     	
     	if (user.get().getRoles().compareTo("ROLE_ADMIN") == 0)
     	{
-    		
+    		if (andringRepo.andringExists())
+    			model.addAttribute("message", "Det finns ohanterade ändringar i registret för kolonilotter. Klicka på Lotter->Uppdateringar!");
     		model.addAttribute("admin", user.get());
     		return ("/index.html");
     	}	

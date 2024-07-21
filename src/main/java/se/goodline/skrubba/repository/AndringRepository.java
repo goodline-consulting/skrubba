@@ -14,7 +14,13 @@ import se.goodline.skrubba.model.Logg;
 public interface AndringRepository extends JpaRepository<Andring, Integer> 
 {
 	 
-
+	@Query(value = "SELECT COUNT(id) FROM andring", nativeQuery=true)
+    public int countById();
+   
+    default boolean andringExists() 
+    {
+        return (countById() > 0);
+    }
 }
 
 

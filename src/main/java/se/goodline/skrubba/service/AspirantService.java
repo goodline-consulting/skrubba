@@ -116,7 +116,7 @@ public class AspirantService
 		aspirantRepo.deleteById(id);
 		userRepo.deleteById(id);
 		betRepo.delBetalningar(id); 
-		visRepo.deleteByAspId(id);
+		//visRepo.deleteByAspId(id);
 		loggService.add("DELETE", asp.getFnamn() + " " + asp.getEnamn() + " med plats " + asp.getKoPlats() + " borttagen ur kön");
 	}
 	public void saveAspirant(Aspirant asp)
