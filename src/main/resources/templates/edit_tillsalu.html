@@ -49,10 +49,7 @@
 					<div class = "card-body">
 						<form class=class="form-inline" role="form" th:action="@{/tillsalu/save}" th:object = "${tillsalu}" method="POST">						
 						<table>
-						<input type="hidden" name = "id" th:value="*{id}" />
-						<!-- 
-						<input type="hidden" name = "sparurl" id = "sparurl" th:value="${tillbaka}" />
-						-->
+						<input type="hidden" name = "id" th:value="*{id}" />						
 						<tr><td>Lottnr:</td>
 						<td th:if = "${lottnr != 0}"><input name="lottnr" th:field = "*{lottnr}" readonly="readonly" class="form-control" placeholder="Ange lottnr"></td>
 						<td th:if = "${lottnr == 0}"><input name="lottnr" th:field = "*{lottnr}"  class="form-control" placeholder="Ange lottnr"></td>
@@ -67,7 +64,27 @@
   						</tr>
   						<tr>
   						<td>Köpare:</td>
-  						<td><input name = "saldtill"	th:field = "*{saldtill}"  class = "form-control" placeholder="ange köparens namn"/></td>
+  						<td th:if="${tillsalu.saljdatum == null}">
+  						 	<select name="asp" th:field="*{asp}" class="form-control">
+                                <option value = "0">Välj köpare</option>      				
+            					<option th:each="aspirant : ${asplista}"
+                    					th:value="${aspirant.id}"
+                    					th:text="${aspirant.fnamn + ' ' + aspirant.enamn}">
+                    					th:selected="${aspirant.id == tillsalu.asp}">
+            					</option>
+        					</select>
+        				</td>
+        				<td th:unless="${tillsalu.saljdatum == null}"><input name = "saldtill"	th:field = "*{saldtill}"  class = "form-control" th:disabled="true"/></td>
+  						</tr>
+  						<tr>
+  						<td>Pris:</td>
+  						<td><input name = "pris"	th:field = "*{pris}"  class = "form-control" placeholder="ange totalt försäljningspris"/></td>
+  						</tr>
+  						<td>Byggnadens Pris:</td>
+  						<td><input name = "pris"	th:field = "*{prisbyggnad}"  class = "form-control" placeholder="ange byggnadens del av det totala försäljningspriset"/></td>
+  						</tr>
+  						<td>Tillträdesdatum:</td>
+  						<td><input type = "date" name = "tilltrdatum"	th:field = "*{tilltrdatum}"  class = "form-control" placeholder="ange tiiträdesdatum"/></td>
   						</tr>
   						<tr>
   						<td><p></p></td>

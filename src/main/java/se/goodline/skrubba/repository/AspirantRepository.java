@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AspirantRepository extends JpaRepository<Aspirant, Integer> {
+public interface AspirantRepository extends JpaRepository<Aspirant, Integer> 
+{
     Aspirant findById(int id);
     
     @Query(value = "SELECT max(ko_plats) FROM aspirant", nativeQuery=true)
@@ -49,5 +50,9 @@ public interface AspirantRepository extends JpaRepository<Aspirant, Integer> {
     
     @Query(value = "SELECT COUNT(a.id) FROM aspirant a WHERE a.betalat is null", nativeQuery=true)
     int getAmountNotPaid();
+    
+    @Query(value = "SELECT * FROM aspirant WHERE id in (select asp from visning where visning.id = ?1 and visning.svar = 'Ja')", nativeQuery=true)
+    public List<Aspirant> findByAccOffer(int saluid);
+    
     
 }

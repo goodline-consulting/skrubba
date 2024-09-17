@@ -31,19 +31,33 @@
    
   </ul>
   <ul class="nav navbar-nav ">
+  	  <li class="nav-item"><a class="nav-link" th:href="@{/visning/erbjudanden/{id}(id=${aspirant.id})}"><span class="fa fa-home"></span> Mina erbjudanden</a></li>
       <li class="nav-item"><a class="nav-link" th:href="@{/aspirant/edit/{id}(id=${aspirant.id})}"><span class="fa fa-user"></span> Mina uppgifter</a></li>
       <li class="nav-item"><a class="nav-link" href="javascript:logoutForm.submit();"><span class="fa fa-sign-in"></span> Logout</a></li>
     </ul>
  
 </nav>
 </div>
+
 <div class="container">
 	<div class="row d-flex justify-content-center">
      	<div class="col-md-8" style="background:white">   
        		<div><p><br><p/></div>        
     	</div> 
     </div>
+    <div th:if = "${message != null}" class="row d-flex justify-content-center align-self-center">
+    	<div  class="alert alert-success alert-dismissible col-md-8 border shadow fade show"  role="alert">
+     		[[${message}]]
+     		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+ 				<span aria-hidden="true">&times;</span>
+			</button> 
+     	</div>
+    </div> 	
     <div class="row d-flex justify-content-center align-self-center">
+    	
+     	
+     
+       
     	<div th:if="${aspirant.koStatus} == 'Aktiv'" class="col-md-8 border shadow" style="background:palegreen">    	
        		<div>                                     
           		<p th:text="${'Din köstatus är ' + aspirant.koStatus}">Din köstatus är Aktiv</p>                  
@@ -54,7 +68,7 @@
           		<p th:text="${'Din köstatus är ' + aspirant.koStatus}">Din köstatus är Aktiv</p>                  
        		</div>        
     	</div>
-    	<div th:if="${aspirant.koStatus} == 'Obetald'" class="col-md-8 border shadow" style="background:Tomato">   
+    	<div th:if="${aspirant.koStatus} == 'Passiv'" class="col-md-8 border shadow" style="background:Tomato">   
     		<div>                                     
           		<p th:text="${'Din köstatus är ' + aspirant.koStatus}">Din köstatus är Aktiv</p>                  
        		</div>        
@@ -80,7 +94,8 @@
 	<div class="row d-flex justify-content-center">
     	<div class="col-md-8 border shadow" style="background:SeaShell">   
        		<div>                                     
-          		<p th:text="${'Din senaste betalning inkom ' + #dates.format(aspirant.betalat, 'yyyy-MM-dd')}">Du har plats 10 i stugkön</p>                  
+          		<p th:if="${aspirant.betalat} != null" th:text="${'Din senaste betalning inkom ' + #dates.format(aspirant.betalat, 'yyyy-MM-dd')}"></p>
+          		<p th:if="${aspirant.betalat} == null" th:text="${'Du har inte betalat årets administationsavgift'}"></p>                  
        		</div>        
     	</div> 
 	</div>

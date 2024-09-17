@@ -42,6 +42,9 @@
 <div class ="container">	
 		<br>
 		<div> 
+			<div th:if="${errorMessage}" class="alert alert-danger">
+    			<p th:text="${errorMessage}"></p>
+			</div>
         	<div th:if = "${message != null}" class="alert alert-success alert-dismissible fade show"  role="alert">
         		[[${message}]]
         		<button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -75,6 +78,8 @@
 						 class = "btn btn-primary">Svar</a>	 
 						 <a th:if = "${tillsalu.saljdatum == null}" th:href = "@{/tillsalu/remove/{id} (id=${tillsalu.id})}"
 						 class = "btn btn-primary" onclick="return confirm('Är du säker på att du vill ta bort försäljingen')">Ta bort</a>	 
+						 <a th:unless = "${tillsalu.saljdatum == null}" th:href = "@{/generate-pdf/{id} (id=${tillsalu.id})}"
+						 class = "btn btn-primary" >Blanketter</a>	 
 <!-- 						 class = "fa fa-trash-o"></a>	 			  -->
 					</td>
 				</tr>

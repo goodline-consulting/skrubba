@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import se.goodline.skrubba.model.Aspirant;
 import se.goodline.skrubba.model.Histpers;
 import se.goodline.skrubba.model.Tillsalu;
@@ -153,5 +155,55 @@ public class VisningsController
 		}		
 		return "redirect:/tillsalulista/0";		
 	}
-	     
+	   
+	@GetMapping("/visning/erbjudanden/{id}")
+	public String visaErbjudanden(@PathVariable int id, RedirectAttributes redirectAttributes, Model model) 
+	{
+		
+		List<Visning> visLista = visRepo.findByAspId(id); 
+		if (visLista.size() == 0)
+		{
+			redirectAttributes.addFlashAttribute("message", "Du har inte fått några erbjudanden om visning");
+			return "redirect:/userpage/" + id;
+		}
+		List<String> svarOptions = Arrays.asList("", "Ja", "Nej");
+		List<Tillsalu> saluLista = new ArrayList();
+		Map<Integer, String> svarLista = new HashMap<>();
+		
+        for (Visning vis : visLista) 
+        {        	
+            Optional<Tillsalu> salu = saluRepo.findById(vis.getId());
+            if (salu.isPresent())
+            {	
+            	saluLista.add(salu.get());
+            	svarLista.put(salu.get().getId(), vis.getSvar());
+            }	
+         }
+        saluLista.sort(Comparator.comparing(Tillsalu::getVisdatum).reversed());
+        model.addAttribute("salulista", saluLista);
+        model.addAttribute("svarlista", svarLista);
+        model.addAttribute("svarOptions", svarOptions);
+        model.addAttribute("actionUrl", "/visning/erbjudanden/" + id);
+	  	return "/aspvisningar.html";      
+	}  
+	
+	@PostMapping("/visning/erbjudanden/{id}")
+	public String ErbjudandenSvar(@PathVariable int id, @RequestParam Map<String, String> svarlista, Model model) 
+	{
+		for (Map.Entry<String, String> entry : svarlista.entrySet()) 
+        {
+        	String key = entry.getKey();
+        	if (key.startsWith("svar")) 
+        	{
+        		int visId = Integer.valueOf(key.substring(4));        		
+        		Optional<Visning> visning = visRepo.findById(visId, id);
+        		if (visning.isPresent())
+        		{
+        			visning.get().setSvar(entry.getValue().equals("") ? null : entry.getValue());
+        			visRepo.save(visning.get());       			
+        		}
+        	}	
+		}	
+		return "redirect:/userpage/" + id;
+	}	
 }

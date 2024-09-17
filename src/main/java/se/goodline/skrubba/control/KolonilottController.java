@@ -56,6 +56,9 @@ public class KolonilottController
 	private AspirantService aspirantService;
 	
 	@Autowired
+	private AspirantRepository aspRepo;
+	
+	@Autowired
 	private EmailService emailService;
 	
 	@Autowired
@@ -85,7 +88,7 @@ public class KolonilottController
 	@GetMapping("/kolonilott/edit/{lottnr}")
 	public String showKoloniForm(@PathVariable int lottnr, Model model) 
 	{		
-		Kolonilott lott = lottRepo.getById(lottnr);	
+		Kolonilott lott = lottRepo.getById(lottnr);
 		/*
 		Optional<Tillsalu> salu = saluRepo.findPagaende(lottnr);
 		
@@ -227,10 +230,13 @@ public class KolonilottController
 	@GetMapping("/tillsalu/edit/{id}/{urval}")
 	public String editTillSaluForm(@PathVariable int id, @PathVariable int urval, Model model) 
 	{
-	  	Tillsalu tillSalu = saluRepo.getById(id);	  	
+	  	Tillsalu tillSalu = saluRepo.getById(id);
+	  	List<Aspirant> tackatJaLista = aspRepo.findByAccOffer(id);
 	  	model.addAttribute("tillsalu", tillSalu);
+	  	model.addAttribute("asplista", tackatJaLista);
 		model.addAttribute("ActionUrl", "/tillsalu/save");
 		model.addAttribute("tillbakaUrl", "/tillsalulista/" + urval);
+		
 		return "/edit_tillsalu.html";      
 	}  
 	
@@ -255,8 +261,19 @@ public class KolonilottController
 			model.addAttribute("tillbakaUrl", "/tillsalulista/0");
 			return "/edit_tillsalu.html";      
 		}	
-		lott.setTillsalu(tillSalu.getSaljdatum() != null ? false : true);
+		lott.setTillsalu(tillSalu.getSaljdatum() != null ? false : true);		
 		lottRepo.save(lott);
+		if (tillSalu.getSaljdatum() == null)
+		{				
+			tillSalu.setAsp(0);
+			tillSalu.setSaldtill(null);
+		}	
+		else
+		{
+			Aspirant asp = aspRepo.findById(tillSalu.getAsp());
+			if (asp != null)
+				tillSalu.setSaldtill(asp.getFnamn() + ' ' + asp.getEnamn());
+		}
 		saluRepo.save(tillSalu);		
 		return "redirect:/tillsalulista/0";	
 	}

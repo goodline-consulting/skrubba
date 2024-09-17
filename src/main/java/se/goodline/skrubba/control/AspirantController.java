@@ -93,7 +93,7 @@ public class AspirantController
 	    if (aspLista == null) {
 	        aspLista = new ArrayList<>();
 	    }
-
+	  
 	    Map<Integer, List<Tillsalu>> visLista = new HashMap<>();
 	    for (Aspirant asp : aspLista) {
 	        int visningar = aspirantService.visningar(asp.getId());
@@ -121,7 +121,7 @@ public class AspirantController
 
 	    model.addAttribute("aspLista", aspLista);
 	    model.addAttribute("visLista", visLista);
-	    return "/aspirantlista.html";
+	    return "/aspirantlista";
 	}
 	
 	@GetMapping("/aspirant/new")

@@ -12,6 +12,7 @@
   <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.datatables.net/1.10.22/js/dataTables.bootstrap4.min.js"></script>
   <script src="https://cdnout.com/bootstrap-table/bootstrap-table-locale-all.js"></script> 
+ 
 </head>
 <title>Skrubba administration</title>
 </head>
@@ -29,12 +30,46 @@
     </li>
   </ul>
   <ul class="nav navbar-nav ">
+  	  <li class="nav-item"><a class="nav-link" onclick="document.getElementById('loadingContainer').style.display = 'flex';" th:href="@{/ekonomi/fakturera}"><span class="fa fa-credit-card"></span> fakturera</a></li>
+  	  <li class="nav-item"><a class="nav-link" onclick="document.getElementById('loadingContainer').style.display = 'flex';" th:href="@{/ekonomi/omfakturera}"><span class="fa fa-envelope-o"></span> omfakturera</a></li>		
       <li class="nav-item"><a class="nav-link" th:href="@{/aspirant/new}"><span class="fa fa-user"></span> Ny person</a></li>
       <li class="nav-item"><a class="nav-link" th:href="@{/}"ß><span class="fa fa-sign-in"></span> Tillbaka</a></li>
     </ul> 
 </nav>
 </div>
-
+ <style>
+	.loading-container {
+	    display: none;
+	    position: fixed;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    background: rgba(255, 255, 255, 0.8);
+	    justify-content: center;
+	    align-items: center;
+	    flex-direction: column;
+	    z-index: 9999;
+	}
+	
+	.loading-spinner {
+	    border: 6px solid #f3f3f3;
+	    border-top: 6px solid #3498db;
+	    border-radius: 50%;
+	    width: 40px;
+	    height: 40px;
+	    animation: spin 1s linear infinite;
+	}
+	
+	@keyframes spin {
+	    0% { transform: rotate(0deg); }
+	    100% { transform: rotate(360deg); }
+	}
+</style>
+<div class="loading-container" id="loadingContainer">
+    	<div class="loading-spinner"></div>
+   		<p>Skapar betalningsposter...</p>
+</div>
 <div class ="container">	
 		<br>
 		<div> 

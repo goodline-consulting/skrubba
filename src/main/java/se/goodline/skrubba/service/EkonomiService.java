@@ -8,7 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Year;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -70,9 +75,11 @@ public class EkonomiService
 		Param par = null;		
 		if (paramOpt.isEmpty())
 		{
-			par = new Param("Fakturaprocess", "Startad");
+			par = new Param("Fakturaprocess", "");
 		}
 		else par = paramOpt.get();
+		par.setParamValue("Startad " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+		paramRepo.save(par);
 		
 		Brevmall mallAktiv = mallRepo.findByNamn("köavgift");
 		Brevmall mallPassiv =  mallRepo.findByNamn("köavgift_passiva");
@@ -141,8 +148,91 @@ public class EkonomiService
 				e.printStackTrace();
 			}	
          }
-		par.setParamValue("Skapat " + antBet + " betalposter, skickat " + totAntal + " brev, Klar!");
+		par.setParamValue("Skapat " + antBet + " betalposter, skickat " + totAntal + " brev, klart " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
 		paramRepo.save(par);
+	}
+	
+	@Async
+	public void omFakturera()
+	{
+		List<Aspirant> aspLista = aspirantRepo.findByNotPaid();		
+		Optional<Param> paramOpt = paramRepo.findByParamName("Betalningspåminnelse");
+		Param par = null;		
+		if (paramOpt.isEmpty())
+		{
+			par = new Param("Betalningspåminnelse", "");
+		}
+		else par = paramOpt.get();
+		par.setParamValue("Startad " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+		paramRepo.save(par);
+		Brevmall mall = mallRepo.findByNamn("Obetald administrationsavgift");
+		
+		EmailForm em = null;
+		int antal = 0;
+		int maxAntal = 20;
+		int totAntal = 0;
+		int antBet = 0;
+		for (Aspirant asp : aspLista)
+		{	
+			Optional<Betalning> bet = betRepo.findThisYear(asp.getId(), Year.now().getValue());
+			
+			try 
+			{
+				if (bet.isEmpty())
+				{	
+					antBet++;
+					createBetalning(asp.getId(), Year.now().getValue());
+					bet = betRepo.findThisYear(asp.getId(), Year.now().getValue());	
+					
+				}	
+				
+				if (bet.get().getMailat() == null || isOlderThanTwoWeeks(bet.get().getMailat()))
+				{
+					antal++;
+					totAntal ++;
+					// Vi får bara skicka max 20 mail i taget så vi måte vänta här i fem minuter					
+					if (antal > maxAntal)
+					{
+						par.setParamValue("Skapat " + antBet + " betalposter, skickat " + (totAntal - 1) + " brev, Pausar");
+						paramRepo.save(par);						
+						Thread.sleep(5 * 60 * 1000);
+						antal = 1;
+						//return;
+					}
+					
+					
+					em = new EmailForm(mall);
+					em = emp.parseAspEmailForm(em, asp);
+					
+					System.out.println("Skickar mail till " + asp.getEmail() + " på köplats " + asp.getKoPlats() + " med status " + asp.getKoStatus());
+					mailService.sendEmail(asp.getEmail(), em);
+					bet.get().setMailat(new Date());
+					betRepo.save(bet.get());
+					
+				}
+            } 
+			catch (DataAccessException e) 
+			{            
+				System.err.println("Betalning finns redan för " + asp.getFnamn() + " " + asp.getEnamn() + " med id: " + asp.getId());
+				
+			} 
+			catch (MessagingException e) 
+			{
+				System.err.println(e.getMessage());				
+			} 
+			catch (IOException e) 
+			{			
+				System.err.println(e.getMessage());
+			} 
+			catch (InterruptedException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+         }
+		par.setParamValue("Skapat " + antBet + " betalposter, skickat " + totAntal + " betalningspåminnelser, Klart " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+		paramRepo.save(par);
+		
 	}
     public void createBetalning(int asp, int ar)
     {
@@ -241,4 +331,22 @@ public class EkonomiService
 		outFile.flush();
 		return mergedFile;
 	}
+    
+    // Metod för att kolla om ett java.util.Date är äldre än två veckor
+    private boolean isOlderThanTwoWeeks(Date mailatDate) {
+        if (mailatDate == null) {
+            return false;  // Hantera null-värden om det behövs
+        }
+
+        // Konvertera java.util.Date till java.time.LocalDate
+        LocalDate mailat = mailatDate.toInstant()
+                                     .atZone(ZoneId.systemDefault())
+                                     .toLocalDate();
+
+        // Beräkna datumet för två veckor sedan
+        LocalDate twoWeeksAgo = LocalDate.now().minus(2, ChronoUnit.WEEKS);
+        
+        // Kontrollera om mailat är äldre än två veckor
+        return mailat.isBefore(twoWeeksAgo);
+    }
 }

@@ -17,8 +17,36 @@ public class Tillsalu
     @DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date saljdatum;
     private String saldtill;
+    private int pris;
+    private int prisbyggnad;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date tilltrdatum;
+    private int asp;
     
-    
+	public int getPris() {
+		return pris;
+	}
+
+	public void setPris(int pris) {
+		this.pris = pris;
+	}
+
+	public int getPrisbyggnad() {
+		return prisbyggnad;
+	}
+
+	public void setPrisbyggnad(int prisbyggnad) {
+		this.prisbyggnad = prisbyggnad;
+	}
+
+	public Date getTilltrdatum() {
+		return tilltrdatum;
+	}
+
+	public void setTilltrdatum(Date tilltrdatum) {
+		this.tilltrdatum = tilltrdatum;
+	}
+
 	public String getSaldtill() {
 		return saldtill;
 	}
@@ -59,13 +87,26 @@ public class Tillsalu
 		this.saljdatum = saljdatum;
 	}
 
-	@Override
-	public String toString() {
-		return "Tillsalu [id=" + id + ", lottnr=" + lottnr + ", visdatum=" + visdatum + ", saljdatum=" + saljdatum + "]";
+	
+	public int getAsp() {
+		return asp;
+	}
+
+	public void setAsp(int asp) {
+		this.asp = asp;
 	}
 
 	public Tillsalu() {
 		super();
+	}
+
+	
+
+	@Override
+	public String toString() {
+		return "Tillsalu [id=" + id + ", lottnr=" + lottnr + ", visdatum=" + visdatum + ", saljdatum=" + saljdatum
+				+ ", saldtill=" + saldtill + ", pris=" + pris + ", prisbyggnad=" + prisbyggnad + ", tilltrdatum="
+				+ tilltrdatum + ", asp=" + asp + "]";
 	}
 
 	public Tillsalu(int id, int lottnr) 

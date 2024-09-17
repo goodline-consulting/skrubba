@@ -76,9 +76,7 @@
 					<th> Inkom </th>				
 					<th> Namn</th>										
 					<th> Email </th>
-					<th> Postadress </th>
-					<th>&nbsp;</th>
-									
+					<th colspan="5"> Postadress </th>													
 				</tr>
 			</thead>			
 			<tbody>				
@@ -87,13 +85,12 @@
 					<td th:text = "${anmalan.fnamn + ' ' + anmalan.enamn}"></td>
 					<td><a th:href = "'mailto:' + ${anmalan.email}"> <i th:text = "${anmalan.email}"></i></a></td>	
 					<td th:text = "${anmalan.padress}"></td>
-					<td>
-						<button type="button" class="btn btn-primary" data-toggle="modal" th:data-target="${'#anm' + anmalan.id}">Visa</button>				
-						<a th:if="${anmalan.mailat == null}" th:href = "@{/anmalningar/confirm/{id}(id=${anmalan.id})}" class = "btn btn-primary">Bekräfta</a>
-						<a th:if="${anmalan.mailat != null}" th:href = "@{/anmalningar/confirm/{id}(id=${anmalan.id})}" class = "btn btn-primary" onclick="return confirm('Bekräftelsemail har redan skickats, är du säker på att du vill skicka ett nytt mail?')">Bekräfta</a>						
-					    <a th:href = "@{/anmalningar/add/{id}(id=${anmalan.id})}" class = "btn btn-primary" onclick="return confirm('Om du lägger till personen till kön så skickas även en betalningsbekrätelse. Är du säker på att betalningen komit in?')">Godkänn</a>
-						<a th:href = "@{/anmalningar/delete/{id}(id=${anmalan.id})}" class = "btn btn-primary" onclick="return confirm('Är du säker på att du vill ta bort anmälan?')">Ta bort</a>
-					</td>
+					<td><button type="button" class="btn btn-primary" data-toggle="modal" th:data-target="${'#anm' + anmalan.id}">Visa</button></td>				
+					<td><a th:if="${anmalan.mailat == null}" th:href = "@{/anmalningar/confirm/{id}(id=${anmalan.id})}" class = "btn btn-primary">Bekräfta</a>
+						<a th:if="${anmalan.mailat != null}" th:href = "@{/anmalningar/confirm/{id}(id=${anmalan.id})}" class = "btn btn-primary" onclick="return confirm('Bekräftelsemail har redan skickats, är du säker på att du vill skicka ett nytt mail?')">Bekräfta</a>
+					</td>												
+					<td><a th:href = "@{/anmalningar/add/{id}(id=${anmalan.id})}" class = "btn btn-primary" onclick="return confirm('Om du lägger till personen till kön så skickas även en betalningsbekrätelse. Är du säker på att betalningen komit in?')">Godkänn</a></td>
+					<td><a th:href = "@{/anmalningar/delete/{id}(id=${anmalan.id})}" class = "btn btn-primary" onclick="return confirm('Är du säker på att du vill ta bort anmälan?')">Radera</a></td>
 					
 				</tr>				
 			</tbody>		

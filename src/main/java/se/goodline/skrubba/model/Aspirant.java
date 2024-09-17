@@ -191,6 +191,7 @@ public class Aspirant
 		this.postnr       = anm.getPostnr();
 		this.postAdress   = anm.getPadress();
 		this.email        = anm.getEmail();
+		this.telefon      = anm.getTelefon();
 		this.inskriven    = new Date();
 		//this.betalat      = betalat;
 		//this.koPlats      = koPlats;

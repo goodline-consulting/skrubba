@@ -89,7 +89,10 @@ public class BetalningsController
 			Aspirant asp = aspRepo.findById(bet.getAsp());
 			bet.setBetdatum(betDatum);
 			asp.setBetalat(betDatum);
+			if (!asp.getKoStatus().equals("Passiv"))
+				asp.setKoStatus("Aktiv");
 			betRepo.save(bet);
+			aspRepo.save(asp);
 			// Skicka betalningsbekräftelse till torparn
 			Brevmall bm = mallRepo.findByNamn("Betalningsbekräftelse");
 			EmailForm em = new EmailForm(bm);
@@ -119,7 +122,10 @@ public class BetalningsController
 			betalning.setSumma(summa);
 			Aspirant asp = aspRepo.findById(betalning.getAsp());
 			asp.setBetalat(betalning.getBetdatum());
+			if (!asp.getKoStatus().equals("Passiv"))
+				asp.setKoStatus("Aktiv");
 			betRepo.save(betalning);
+			aspRepo.save(asp);
 			Brevmall bm = mallRepo.findByNamn("Betalningsbekräftelse");
 			EmailForm em = new EmailForm(bm);
 			emailService.sendBetalningsBekraftelse(em, asp);

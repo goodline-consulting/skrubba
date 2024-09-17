@@ -131,8 +131,8 @@ public class ForgotPasswordController
 		
         try 
         {
-			//mailService.sendPasswordLink(user.getUserName(), resetPasswordLink);
-			mailService.sendPasswordLink("robert@goodline.se", resetPasswordLink);
+			mailService.sendPasswordLink(user.getUserName(), resetPasswordLink);
+			//mailService.sendPasswordLink("robert@goodline.se", resetPasswordLink);
 		} 
         catch (UnsupportedEncodingException e) 
         {

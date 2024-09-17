@@ -20,6 +20,7 @@ import se.goodline.skrubba.model.Aspirant;
 import se.goodline.skrubba.model.EmailForm;
 import se.goodline.skrubba.model.Kolonilott;
 import se.goodline.skrubba.repository.AspirantRepository;
+import se.goodline.skrubba.repository.BrevmallRepository;
 import se.goodline.skrubba.repository.KoloniLottRepository;
 import se.goodline.skrubba.repository.ParamRepository;
 
@@ -40,6 +41,9 @@ public class EmailService
 	
 	@Autowired
 	AspirantRepository aspRepo;
+	
+	@Autowired
+	BrevmallRepository mallRepo;
 	
 	@Autowired
 	LoggService loggService;
@@ -196,5 +200,11 @@ public class EmailService
 		emNy.setBilageLista(em.getBilageLista());
 		sendEmail(asp.getEmail(), emNy);
 		loggService.add("BEKR", "Skickar betalningsbekrätelse till " + asp.getEmail());
-	}		
+	}	
+	public boolean mallExists(String mallNamn)
+	{
+		if (mallRepo.findByNamn(mallNamn) == null)
+			return false;
+		return true;
+	}
 }

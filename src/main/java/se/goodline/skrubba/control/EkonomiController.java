@@ -56,6 +56,7 @@ import se.goodline.skrubba.service.EkonomiService;
 import se.goodline.skrubba.service.EmailService;
 import se.goodline.skrubba.service.KoloniLoader;
 import se.goodline.skrubba.service.SkrubbaUserDetailsService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class EkonomiController 
@@ -69,6 +70,10 @@ public class EkonomiController
 	
 	@Autowired
 	EkonomiService ekoService;
+	
+	@Autowired 
+	EmailService emailService;
+	
 	
 	@GetMapping("/ekonomi")
 	public String ekonomi(Model model) 
@@ -86,12 +91,38 @@ public class EkonomiController
 	
 	
 	@GetMapping("/ekonomi/fakturera")
-	public String faktureraBetalning (Model model) 
+	public String faktureraBetalning (RedirectAttributes redirectAttributes) 
 	{	
-		ekoService.fakturera();
-		model.addAttribute("datum", new Date());
-		model.addAttribute("message", "Betalpost skapas och mail skickas till alla i kön i bakgrunden. Kontroller status på processen under inställningar, Fakturaprocess");
-		return "/ekonomi.html";  		
+		if (!emailService.mallExists("köavgift_passiva"))
+		{
+			redirectAttributes.addFlashAttribute("message", "Brevmallen 'köavgift_passiva' saknas. Fakturor kan inte skickas ut!");	
+		}
+		else if (!emailService.mallExists("köavgift"))
+		{
+			redirectAttributes.addFlashAttribute("message", "Brevmallen 'köavgift' saknas. Fakturor kan inte skickas ut!");	
+		}
+		else
+		{
+			ekoService.fakturera();
+			
+			redirectAttributes.addFlashAttribute("message", "Betalpost skapas och mail skickas till alla i kön i bakgrunden. Kontroller status på processen under Underhåll->Inställningar->Fakturaprocess");
+		}	
+		return "redirect:/aspirantlista";   		
+	}	
+	
+	@GetMapping("/ekonomi/omfakturera")
+	public String omfaktureraBetalning (RedirectAttributes redirectAttributes) 
+	{	
+		if (!emailService.mallExists("Obetald administrationsavgift"))
+		{
+			redirectAttributes.addFlashAttribute("message", "Brevmallen 'Obetald administrationsavgift' saknas. Påminnelser kan inte skickas ut!");	
+		}
+		else
+		{	
+			ekoService.omFakturera();		
+			redirectAttributes.addFlashAttribute("message", "Betalningspåminnelser skickas i bakgrunden till alla i kön som inte betalat administrationsavgiften. Kontrollera status på processen under Underhåll->Inställningar->Betalningspåminnelse");
+		}
+		return "redirect:/aspirantlista";   		
 	}	
 	
 	@PostMapping("ekonomi/updatevisma/")
